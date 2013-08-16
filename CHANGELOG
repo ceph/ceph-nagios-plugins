@@ -1,0 +1,5 @@
+Nagios plugins for Ceph
+-----------------------
+Version 1.0:
+* Initial release of the 'ceph health' nagios plugin
+
