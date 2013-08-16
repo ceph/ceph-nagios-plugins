@@ -44,15 +44,15 @@ def main():
     # validate args
     ceph_exec = args.exe if args.exe else CEPH_COMMAND
     if not os.path.exists(ceph_exec):
-        print "ERR: ceph executable '%s' doesn't exist" % ceph_exec
+        print "ERROR: ceph executable '%s' doesn't exist" % ceph_exec
         return STATUS_UNKNOWN
         
     if args.conf and not os.path.exists(args.conf):
-        print "ERR: ceph conf file '%s' doesn't exist" % args.conf
+        print "ERROR: ceph conf file '%s' doesn't exist" % args.conf
         return STATUS_UNKNOWN
     
     if args.keyring and not os.path.exists(args.keyring):
-        print "ERR: keyring file '%s' doesn't exist" % args.keyring
+        print "ERROR: keyring file '%s' doesn't exist" % args.keyring
         return STATUS_UNKNOWN
     
     # build command
@@ -102,7 +102,7 @@ def main():
         one_line = err.split('\n')[0]
         if '-1 ' in one_line:
             idx = one_line.rfind('-1 ')
-            print 'ERROR: ceph:', one_line[idx+len('-1 '):]
+            print 'ERROR: %s: %s' % (ceph_exec, one_line[idx+len('-1 '):])
         else:
             print one_line
     
@@ -111,3 +111,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
