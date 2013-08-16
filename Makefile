@@ -1,6 +1,4 @@
-#############################################################################
-# Copyright (c) Members of the EGEE Collaboration. 2006-2010.
-# See http://www.eu-egee.org/partners/ for details on the copyright holders.
+# Copyright (c) 2013 SWITCH http://www.switch.ch
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,18 +13,16 @@
 # limitations under the License.
 #
 # Authors:
-#     Joel Casutt     <joel.casutt@switch.ch>
 #     Valery Tschopp  <valery.tschopp@switch.ch>
-#############################################################################
 
-name = nagios-plugins-argus
+name = nagios-plugins-ceph
 
-version = 1.1.0
+version = 1.0
 release = 1
 
-PROBES_NAMESPACE = $(name)
-PROBES_LIBEXECDIR = /usr/libexec/grid-monitoring/probes/$(PROBES_NAMESPACE)
-PROBES_VARDIR = /var/lib/grid-monitoring/$(PROBES_NAMESPACE)
+# configure like options
+prefix = /usr/local/nagios
+libexecdir = $(prefix)/libexecdir
 
 tmp_dir = $(CURDIR)/tmp
 
@@ -48,10 +44,7 @@ dist:
 
 
 install:
-	@echo "Installing Nagios probes in $(DESTDIR)$(PROBES_LIBEXECDIR)..."
-	install -d $(DESTDIR)$(PROBES_LIBEXECDIR)
-	install -m 0755 src/nagios-plugins-argus.* $(DESTDIR)$(PROBES_LIBEXECDIR)
-	install -d $(DESTDIR)$(PROBES_LIBEXECDIR)/framework
-	install -m 0644 src/framework/*.py $(DESTDIR)$(PROBES_LIBEXECDIR)/framework
-	install -d $(DESTDIR)$(PROBES_VARDIR)
+	@echo "Installing Ceph Nagios plugins in $(DESTDIR)$(libexecdir)..."
+	install -d $(DESTDIR)$(libexecdir)
+	install -m 0755 src/* $(DESTDIR)$(libexecdir)
 
