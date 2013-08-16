@@ -1,6 +1,6 @@
 # Nagios plugins for Ceph
 
-A collection of nagios plugins to monitor [Ceph][]
+A collection of nagios plugins to monitor a [Ceph][] cluster.
 
 ## ceph-health
 
@@ -26,7 +26,7 @@ The `ceph-health` nagios plugin montiors the ceph cluster, and report its health
 
 ### Authentication
 
-Ceph is normally configured to use [cephx] to authenticate the client. 
+Ceph is normally configured to use [cephx] to authenticate its client. 
 
 To run the `ceph-health` plugin as user `nagios` you have to create a special keyring:
 
@@ -36,9 +36,16 @@ And use this keyring with the plugin:
 
     nagios$ ceph-health --id nagios --keyring client.nagios.keyring
     
+### Example
 
-Installation
-------------
+    nagios$ ./ceph-health --id nagios --keyring client.nagios.keyring
+    HEALTH WARNING: 1 pgs degraded; 1 pgs recovering; 1 pgs stuck unclean; recovery 4448/28924462 degraded (0.015%); 2/9857830 unfound (0.000%); 
+    nagios$ echo $?
+    1
+    nagios$
+
+# Installation
+
 Just type `make install` in the same directory as this README file can be found
 
 
