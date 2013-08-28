@@ -20,6 +20,8 @@ import os
 import subprocess
 import sys
 
+__version__ = '1.0'
+
 # default ceph values
 CEPH_COMMAND = '/usr/bin/ceph'
 
@@ -39,14 +41,19 @@ def main():
     parser.add_argument('-i','--id', help='ceph client id')
     parser.add_argument('-k','--keyring', help='ceph client keyring file')
     parser.add_argument('-d','--detail', help="exec 'ceph health detail'", action='store_true')
+    parser.add_argument('-V','--version', help='show version and exit', action='store_true')
     args = parser.parse_args()
-    
+   
     # validate args
     ceph_exec = args.exe if args.exe else CEPH_COMMAND
     if not os.path.exists(ceph_exec):
         print "ERROR: ceph executable '%s' doesn't exist" % ceph_exec
         return STATUS_UNKNOWN
-        
+    
+    if args.version:
+        print 'version %s' % __version__
+        return STATUS_OK
+
     if args.conf and not os.path.exists(args.conf):
         print "ERROR: ceph conf file '%s' doesn't exist" % args.conf
         return STATUS_UNKNOWN
