@@ -20,7 +20,7 @@ import os
 import subprocess
 import sys
 
-__version__ = '1.0'
+__version__ = '1.0.1'
 
 # default ceph values
 CEPH_COMMAND = '/usr/bin/ceph'
@@ -93,7 +93,12 @@ def main():
         # merge multi-lines of output in one line
         one_line = output.replace('\n','; ')
         if one_line.startswith('HEALTH_OK'):
-            print 'HEALTH OK:', one_line[len('HEALTH_OK')+1:]
+            #print 'HEALTH OK:', one_line[len('HEALTH_OK')+1:]
+            one_line= one_line[len('HEALTH_OK')+1:].strip()
+            if one_line:
+                print 'HEALTH OK:', one_line
+            else:
+                print 'HEALTH OK'
             return STATUS_OK
         elif one_line.startswith('HEALTH_WARN'):
             print 'HEALTH WARNING:', one_line[len('HEALTH_WARN')+1:]
