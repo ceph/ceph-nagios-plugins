@@ -1,5 +1,8 @@
 Nagios plugins for Ceph
 -----------------------
+Version 1.0.1:
+* HEALTH_OK doesn't always have additional information.
+
 Version 1.0:
-* 'ceph health' nagios plugin
+* Initial 'ceph health' nagios plugin.
 
