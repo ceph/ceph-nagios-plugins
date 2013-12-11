@@ -13,7 +13,8 @@
 # limitations under the License.
 #
 # Authors:
-#     Valery Tschopp  <valery.tschopp@switch.ch>
+#     Valery Tschopp <valery.tschopp@switch.ch> - main
+#     Ricardo Rocha <ricardo@catalyst.net.nz> - debian package
 
 name = nagios-plugins-ceph
 
@@ -30,7 +31,7 @@ tmp_dir = $(CURDIR)/tmp
 .PHONY: clean dist install
 
 clean:
-	rm -rf $(tmp_dir) *.tar.gz
+	rm -rf $(tmp_dir) *.tar.gz *.deb
 
 dist:
 	@echo "Packaging sources"
@@ -39,20 +40,21 @@ dist:
 	cp Makefile $(tmp_dir)/$(name)-$(version)
 	cp COPYRIGHT LICENSE README.md CHANGELOG $(tmp_dir)/$(name)-$(version)
 	cp -r src $(tmp_dir)/$(name)-$(version)
+	cp -r debian $(tmp_dir)/$(name)-$(version)
 	test ! -f $(name)-$(version).tar.gz || rm $(name)-$(version).tar.gz
 	tar -C $(tmp_dir) -czf $(name)-$(version).tar.gz $(name)-$(version)
 	rm -fr $(tmp_dir)
 
 install:
-	@echo "Installing Ceph Nagios plugins in $(DESTDIR)$(libdir)/nagios/plugins..."
+	@echo "Installing Ceph Nagios plugins in $(DESTDIR)$(nagiosdir)"
 	install -d $(DESTDIR)$(nagiosdir)
 	install -m 0755 src/* $(DESTDIR)$(nagiosdir)
 
 deb: dist
+	@echo "Debian packaging..."
 	mkdir -p $(tmp_dir)
 	cp $(name)-$(version).tar.gz $(tmp_dir)/$(name)_$(version).orig.tar.gz
-	cd $(tmp_dir); tar zxvf $(name)_$(version).orig.tar.gz
-	cp -R debian $(tmp_dir)/$(name)-$(version)
+	tar -C $(tmp_dir) -xzf $(tmp_dir)/$(name)_$(version).orig.tar.gz
 	cd $(tmp_dir)/$(name)-$(version); debuild -uc -us
 	cp $(tmp_dir)/$(name)*.deb .
 	rm -rf $(tmp_dir)
