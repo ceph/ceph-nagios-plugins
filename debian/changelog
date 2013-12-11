@@ -1,0 +1,5 @@
+nagios-plugins-ceph (1.0.1-1) UNRELEASED; urgency=low
+
+  * Initial release
+
+ -- Ricardo Rocha <rocha@rocha-x11>  Wed, 11 Dec 2013 15:52:10 +1300

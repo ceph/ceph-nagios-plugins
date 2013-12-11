@@ -1,0 +1,12 @@
+Source: nagios-plugins-ceph
+Maintainer: Ricardo Rocha <ricardo@catalyst.net.nz>
+Section: misc
+Priority: optional
+Standards-Version: 3.9.2
+Build-Depends: debhelper (>= 9)
+
+Package: nagios-plugins-ceph
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: nagios plugins for ceph
+  This package provides a set of plugins to monitor a ceph cluster.

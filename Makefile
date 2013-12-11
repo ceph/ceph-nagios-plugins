@@ -21,8 +21,9 @@ version = 1.0.1
 release = 1
 
 # configure like options
-prefix = /usr/local/nagios
-libexecdir = $(prefix)/libexecdir
+prefix = /usr
+libdir = $(prefix)/lib
+nagiosdir = $(libdir)/nagios/plugins
 
 tmp_dir = $(CURDIR)/tmp
 
@@ -42,9 +43,16 @@ dist:
 	tar -C $(tmp_dir) -czf $(name)-$(version).tar.gz $(name)-$(version)
 	rm -fr $(tmp_dir)
 
-
 install:
-	@echo "Installing Ceph Nagios plugins in $(DESTDIR)$(libexecdir)..."
-	install -d $(DESTDIR)$(libexecdir)
-	install -m 0755 src/* $(DESTDIR)$(libexecdir)
+	@echo "Installing Ceph Nagios plugins in $(DESTDIR)$(libdir)/nagios/plugins..."
+	install -d $(DESTDIR)$(nagiosdir)
+	install -m 0755 src/* $(DESTDIR)$(nagiosdir)
 
+deb: dist
+	mkdir -p $(tmp_dir)
+	cp $(name)-$(version).tar.gz $(tmp_dir)/$(name)_$(version).orig.tar.gz
+	cd $(tmp_dir); tar zxvf $(name)_$(version).orig.tar.gz
+	cp -R debian $(tmp_dir)/$(name)-$(version)
+	cd $(tmp_dir)/$(name)-$(version); debuild -uc -us
+	cp $(tmp_dir)/$(name)*.deb .
+	rm -rf $(tmp_dir)
