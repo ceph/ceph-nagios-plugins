@@ -1,0 +1,112 @@
+#!/usr/bin/env python
+#
+#  Copyright (c) 2013 Catalyst IT http://www.catalyst.net.nz
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+
+import argparse
+import os
+import re
+import subprocess
+import sys
+
+__version__ = '1.0.1'
+
+# default ceph values
+CEPH_COMMAND = '/usr/bin/ceph'
+
+# nagios exit code
+STATUS_OK = 0
+STATUS_WARNING = 1
+STATUS_ERROR = 2
+STATUS_UNKNOWN = 3
+
+def main():
+
+  # parse args
+  parser = argparse.ArgumentParser(description="'ceph mon' nagios plugin.")
+  parser.add_argument('-e','--exe', help='ceph executable [%s]' % CEPH_COMMAND)
+  parser.add_argument('-c','--conf', help='alternative ceph conf file')
+  parser.add_argument('-m','--monaddress', help='ceph monitor to use for queries (address[:port])')    
+  parser.add_argument('-i','--id', help='ceph client id')
+  parser.add_argument('-k','--keyring', help='ceph client keyring file')
+  parser.add_argument('-V','--version', help='show version and exit', action='store_true')
+  parser.add_argument('-I','--monid', help='mon id to be checked for availability')
+  parser.add_argument('-H','--host', help='mon host to be checked for availability')
+  args = parser.parse_args()
+ 
+  # validate args
+  ceph_exec = args.exe if args.exe else CEPH_COMMAND
+  if not os.path.exists(ceph_exec):
+    print "MON ERROR: ceph executable '%s' doesn't exist" % ceph_exec
+    return STATUS_UNKNOWN
+  
+  if args.version:
+    print 'version %s' % __version__
+    return STATUS_OK
+
+  if args.conf and not os.path.exists(args.conf):
+    print "MON ERROR: ceph conf file '%s' doesn't exist" % args.conf
+    return STATUS_UNKNOWN
+  
+  if args.keyring and not os.path.exists(args.keyring):
+    print "MON ERROR: keyring file '%s' doesn't exist" % args.keyring
+    return STATUS_UNKNOWN
+  
+  if not args.monid:
+    print "MON ERROR: no MON ID given"
+    return STATUS_UNKNOWN
+
+  if not args.host:
+    print "MON ERROR: no MON hostname given"
+    return STATUS_UNKNOWN
+
+  # build command
+  ceph_cmd = [ceph_exec]
+  if args.monaddress:
+      ceph_cmd.append('-m')
+      ceph_cmd.append(args.monaddress)
+  if args.conf:
+      ceph_cmd.append('-c')
+      ceph_cmd.append(args.conf)
+  if args.id:
+      ceph_cmd.append('--id')
+      ceph_cmd.append(args.id)
+  if args.keyring:
+      ceph_cmd.append('--keyring')
+      ceph_cmd.append(args.keyring)
+  ceph_cmd.append('mon')
+  ceph_cmd.append('dump')
+
+  # exec command
+  p = subprocess.Popen(ceph_cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+  output, err = p.communicate()
+
+  if p.returncode != 0 or not output:
+    print "MON ERROR: %s :: %s" % (output, err)
+    return STATUS_ERROR
+
+  # else we do our checks
+  up = re.match(".*%s.*mon\.%s.*" % (args.host.replace('.', '\.'), args.monid), output, re.DOTALL)
+
+  if up:
+    print "MON OK"
+    return STATUS_OK
+
+  print "MON WARN: no MON.%s found at host %s" % (args.monid, args.host)
+  return STATUS_WARNING
+
+if __name__ == "__main__":
+    sys.exit(main())
+

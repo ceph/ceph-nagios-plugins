@@ -21,9 +21,11 @@ version = 1.0.1
 release = 1
 
 # configure like options
-prefix = /usr
-libdir = $(prefix)/lib
+prefix = /
+libdir = $(prefix)usr/lib
+etcdir = $(prefix)etc
 nagiosdir = $(libdir)/nagios/plugins
+nagioscfgdir = $(etcdir)/nagios-plugins/config
 
 tmp_dir = $(CURDIR)/tmp
 
@@ -39,6 +41,7 @@ dist:
 	cp Makefile $(tmp_dir)/$(name)-$(version)
 	cp COPYRIGHT LICENSE README.md CHANGELOG $(tmp_dir)/$(name)-$(version)
 	cp -r src $(tmp_dir)/$(name)-$(version)
+	cp -r config $(tmp_dir)/$(name)-$(version)
 	test ! -f $(name)-$(version).tar.gz || rm $(name)-$(version).tar.gz
 	tar -C $(tmp_dir) -czf $(name)-$(version).tar.gz $(name)-$(version)
 	rm -fr $(tmp_dir)
@@ -47,6 +50,8 @@ install:
 	@echo "Installing Ceph Nagios plugins in $(DESTDIR)$(libdir)/nagios/plugins..."
 	install -d $(DESTDIR)$(nagiosdir)
 	install -m 0755 src/* $(DESTDIR)$(nagiosdir)
+	install -d $(DESTDIR)$(nagioscfgdir)
+	install -m 0755 config/* $(DESTDIR)$(nagioscfgdir)
 
 deb: dist
 	mkdir -p $(tmp_dir)
