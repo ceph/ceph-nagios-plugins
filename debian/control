@@ -2,7 +2,7 @@ Source: nagios-plugins-ceph
 Maintainer: Ricardo Rocha <ricardo@catalyst.net.nz>
 Section: misc
 Priority: optional
-Standards-Version: 3.9.2
+Standards-Version: 3.9.1
 Build-Depends: debhelper (>= 8)
 
 Package: nagios-plugins-ceph
