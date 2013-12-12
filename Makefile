@@ -17,18 +17,19 @@
 #     Ricardo Rocha <ricardo@catalyst.net.nz> - debian package
 
 name = nagios-plugins-ceph
+version = 1.1.0
 
-version = 1.0.1
-release = 1
-
-# configure like options
+# install options (like configure)
+# ex: make sysconfdir=/etc libdir=/usr/lib64 sysconfdir=/etc install
 prefix = /usr
 libdir = $(prefix)/lib
+sysconfdir = $(prefix)/etc
 nagiosdir = $(libdir)/nagios/plugins
+nagiosconfdir = $(sysconfdir)/nagios-plugins/config
 
 tmp_dir = $(CURDIR)/tmp
 
-.PHONY: clean dist install
+.PHONY: clean dist install deb
 
 clean:
 	rm -rf $(tmp_dir) *.tar.gz *.deb
@@ -40,6 +41,7 @@ dist:
 	cp Makefile $(tmp_dir)/$(name)-$(version)
 	cp COPYRIGHT LICENSE README.md CHANGELOG $(tmp_dir)/$(name)-$(version)
 	cp -r src $(tmp_dir)/$(name)-$(version)
+	cp -r config $(tmp_dir)/$(name)-$(version)
 	cp -r debian $(tmp_dir)/$(name)-$(version)
 	test ! -f $(name)-$(version).tar.gz || rm $(name)-$(version).tar.gz
 	tar -C $(tmp_dir) -czf $(name)-$(version).tar.gz $(name)-$(version)
@@ -49,6 +51,8 @@ install:
 	@echo "Installing Ceph Nagios plugins in $(DESTDIR)$(nagiosdir)"
 	install -d $(DESTDIR)$(nagiosdir)
 	install -m 0755 src/* $(DESTDIR)$(nagiosdir)
+	install -d $(DESTDIR)$(nagiosconfdir)
+	install -m 0755 config/* $(DESTDIR)$(nagiosconfdir)
 
 deb: dist
 	@echo "Debian packaging..."

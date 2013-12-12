@@ -6,3 +6,9 @@
 
 %:
 	dh $@
+
+# install in official directories
+override_dh_auto_install:
+	dh_auto_install -- prefix=/usr sysconfdir=/etc
+
+
