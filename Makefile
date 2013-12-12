@@ -40,9 +40,9 @@ dist:
 	mkdir -p $(tmp_dir)/$(name)-$(version)
 	cp Makefile $(tmp_dir)/$(name)-$(version)
 	cp COPYRIGHT LICENSE README.md CHANGELOG $(tmp_dir)/$(name)-$(version)
-	cp -r src $(tmp_dir)/$(name)-$(version)
-	cp -r config $(tmp_dir)/$(name)-$(version)
-	cp -r debian $(tmp_dir)/$(name)-$(version)
+	cp -R src $(tmp_dir)/$(name)-$(version)
+	cp -R config $(tmp_dir)/$(name)-$(version)
+	cp -R debian $(tmp_dir)/$(name)-$(version)
 	test ! -f $(name)-$(version).tar.gz || rm $(name)-$(version).tar.gz
 	tar -C $(tmp_dir) -czf $(name)-$(version).tar.gz $(name)-$(version)
 	rm -fr $(tmp_dir)
@@ -62,3 +62,4 @@ deb: dist
 	cd $(tmp_dir)/$(name)-$(version); debuild -uc -us
 	cp $(tmp_dir)/$(name)*.deb .
 	rm -rf $(tmp_dir)
+
