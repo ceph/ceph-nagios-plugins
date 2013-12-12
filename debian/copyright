@@ -1,18 +1,21 @@
 This work was packaged for Debian by:
 
-    Ricardo Rocha <ricardo@catalyst.net.nz>  Wed, 11 Dec 2013 15:52:10 +1300
+   Valery Tschopp <valery.tschopp@switch.ch>  Thu, 12 Dec 2013 16:17:42 +0100
+   Ricardo Rocha <ricardo@catalyst.net.nz>  Wed, 11 Dec 2013 15:52:10 +1300
 
 It was downloaded from:
 
-    https://github.com/valerytschopp/ceph-nagios-plugins
+   https://github.com/valerytschopp/ceph-nagios-plugins
 
 Upstream Author(s):
 
-    Valery Tschopp <valery.tschopp@switch.ch>
+   Valery Tschopp <valery.tschopp@switch.ch>
+   Ricardo Rocha <ricardo@catalyst.net.nz>
 
 Copyright:
 
    Copyright (c) 2013 SWITCH http://www.switch.ch
+   Copyright (c) 2013 Catalyst IT http://www.catalyst.net.nz
 
 License:
 
