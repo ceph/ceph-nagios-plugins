@@ -13,8 +13,8 @@
 # limitations under the License.
 #
 # Authors:
-#     Valery Tschopp <valery.tschopp@switch.ch> - main
-#     Ricardo Rocha <ricardo@catalyst.net.nz> - debian package
+#     Valery Tschopp <valery.tschopp@switch.ch>
+#     Ricardo Rocha <ricardo@catalyst.net.nz>
 
 name = nagios-plugins-ceph
 version = 1.1.0

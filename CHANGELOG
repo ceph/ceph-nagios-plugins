@@ -1,5 +1,9 @@
 Nagios plugins for Ceph
 -----------------------
+Version 1.0.0:
+* check_ceph_mon plugin added.
+* check_ceph_osd plugin added.
+
 Version 1.0.1:
 * HEALTH_OK doesn't always have additional information.
 
