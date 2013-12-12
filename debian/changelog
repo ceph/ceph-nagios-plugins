@@ -2,7 +2,7 @@ nagios-plugins-ceph (1.1.0-1) unstable; urgency=low
 
   * Upstream version 1.1.0
 
- -- Valery Tschopp <valery.tschopp@switch.ch>  Thu, 12 Dec 2013 16:17:42 +0100
+ -- Ricardo Rocha <ricardo@catalyst.net.nz>  Thu, 12 Dec 2013 16:17:42 +0100
 
 nagios-plugins-ceph (1.0.1-1) unstable; urgency=low
 

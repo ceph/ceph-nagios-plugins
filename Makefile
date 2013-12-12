@@ -52,7 +52,7 @@ install:
 	install -d $(DESTDIR)$(nagiosdir)
 	install -m 0755 src/* $(DESTDIR)$(nagiosdir)
 	install -d $(DESTDIR)$(nagiosconfdir)
-	install -m 0755 config/* $(DESTDIR)$(nagiosconfdir)
+	install -m 0644 config/* $(DESTDIR)$(nagiosconfdir)
 
 deb: dist
 	@echo "Debian packaging..."
