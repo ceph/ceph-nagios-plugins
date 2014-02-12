@@ -85,16 +85,16 @@ Possible result includes OK (up), WARN (down or missing).
 
 ### Usage
 
-usage: check_ceph_rgw [-h] [-e EXE] [-c CONF] [-i ID] [-V]
+    usage: check_ceph_rgw [-h] [-e EXE] [-c CONF] [-i ID] [-V]
 
-'ceph rgw' nagios plugin.
+    'ceph rgw' nagios plugin.
 
-optional arguments:
-  -h, --help            show this help message and exit
-  -e EXE, --exe EXE     radosgw-admin executable [/usr/bin/radosgw-admin]
-  -c CONF, --conf CONF  alternative ceph conf file
-  -i ID, --id ID        ceph client id
-  -V, --version         show version and exit
+    optional arguments:
+      -h, --help            show this help message and exit
+      -e EXE, --exe EXE     radosgw-admin executable [/usr/bin/radosgw-admin]
+      -c CONF, --conf CONF  alternative ceph conf file
+      -i ID, --id ID        ceph client id
+      -V, --version         show version and exit
 
 ### Authentication
 
