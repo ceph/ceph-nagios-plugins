@@ -77,6 +77,25 @@ Possible result includes OK (up), WARN (down or missing).
                             osd id
       -H HOST, --host HOST  osd host
 
+## check_ceph_rgw
+
+The `check_ceph_rgw` nagios plugin monitors a ceph rados gateway, reporting its status.
+
+Possible result includes OK (up), WARN (down or missing).
+
+### Usage
+
+    usage: check_ceph_rgw [-h] [-e EXE] [-c CONF] [-i ID] [-V]
+
+    'ceph rgw' nagios plugin.
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -e EXE, --exe EXE     radosgw-admin executable [/usr/bin/radosgw-admin]
+      -c CONF, --conf CONF  alternative ceph conf file
+      -i ID, --id ID        ceph client id
+      -V, --version         show version and exit
+
 ## Authentication
 
 Ceph is normally configured to use [cephx] to authenticate its client. 
