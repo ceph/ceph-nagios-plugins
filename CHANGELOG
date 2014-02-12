@@ -1,5 +1,8 @@
 Nagios plugins for Ceph
 -----------------------
+Version 1.2.0:
+* check_ceph_rgw plugin added.
+
 Version 1.1.0:
 * check_ceph_mon plugin added.
 * check_ceph_osd plugin added.
