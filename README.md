@@ -96,7 +96,7 @@ Possible result includes OK (up), WARN (down or missing).
       -i ID, --id ID        ceph client id
       -V, --version         show version and exit
 
-### Authentication
+## Authentication
 
 Ceph is normally configured to use [cephx] to authenticate its client. 
 
@@ -108,7 +108,7 @@ And use this keyring with the plugin:
 
     nagios$ ./check_ceph_health --id nagios --keyring client.nagios.keyring
     
-### Example
+## Example
 
     nagios$ ./check_ceph_health --id nagios --keyring client.nagios.keyring
     HEALTH WARNING: 1 pgs degraded; 1 pgs recovering; 1 pgs stuck unclean; recovery 4448/28924462 degraded (0.015%); 2/9857830 unfound (0.000%); 
