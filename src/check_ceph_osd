@@ -42,8 +42,8 @@ def main():
   parser.add_argument('-i','--id', help='ceph client id')
   parser.add_argument('-k','--keyring', help='ceph client keyring file')
   parser.add_argument('-V','--version', help='show version and exit', action='store_true')
-  parser.add_argument('-I','--osdid', help='osd id')
-  parser.add_argument('-H','--host', help='osd host')
+  parser.add_argument('-H','--host', help='osd host', required=True)
+  parser.add_argument('-I','--osdid', help='osd id', required=True)
   args = parser.parse_args()
  
   # validate args
