@@ -35,7 +35,7 @@ STATUS_UNKNOWN = 3
 def main():
 
   # parse args
-  parser = argparse.ArgumentParser(description="'ceph rgw' nagios plugin.")
+  parser = argparse.ArgumentParser(description="'ceph radosgw-admin' nagios plugin.")
   parser.add_argument('-e','--exe', help='radosgw-admin executable [%s]' % RGW_COMMAND)
   parser.add_argument('-c','--conf', help='alternative ceph conf file')
   parser.add_argument('-i','--id', help='ceph client id')
