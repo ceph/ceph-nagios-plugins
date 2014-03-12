@@ -98,7 +98,11 @@ def main():
     return STATUS_ERROR
 
   # else we do our checks
-  up = re.match(".*%s.*mon\.%s.*" % (args.host.replace('.', '\.'), args.monid), output, re.DOTALL)
+  mon_host = args.host.replace('.', '\.')
+  # IPv6 host
+  mon_host = mon_host.replace('[', '\[')
+  mon_host = mon_host.replace(']', '\]')
+  up = re.match(".*%s.*mon\.%s.*" % (mon_host, args.monid), output, re.DOTALL)
 
   if up:
     print "MON OK"
