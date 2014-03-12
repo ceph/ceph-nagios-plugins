@@ -42,8 +42,9 @@ def main():
   parser.add_argument('-i','--id', help='ceph client id')
   parser.add_argument('-k','--keyring', help='ceph client keyring file')
   parser.add_argument('-V','--version', help='show version and exit', action='store_true')
-  parser.add_argument('-I','--osdid', help='osd id')
-  parser.add_argument('-H','--host', help='osd host')
+  parser.add_argument('-H','--host', help='osd host', required=True)
+  parser.add_argument('-I','--osdid', help='osd id', required=False)
+  parser.add_argument('-o','--out', help='check osds that are set OUT', default=False, action='store_true', required=False)
   args = parser.parse_args()
  
   # validate args
@@ -65,8 +66,7 @@ def main():
     return STATUS_UNKNOWN
   
   if not args.osdid:
-    print "OSD ERROR: no OSD ID given"
-    return STATUS_UNKNOWN
+    args.osdid = '[^ ]*'
 
   if not args.host:
     print "OSD ERROR: no OSD hostname given"
@@ -98,22 +98,35 @@ def main():
     return STATUS_ERROR
 
   # else we do our checks
-  osd_host = args.host.replace('.', '\.')
   # IPv6 host
+  osd_host = args.host.replace('.', '\.')
   osd_host = osd_host.replace('[', '\[')
   osd_host = osd_host.replace(']', '\]')
-  up = re.match(".*osd\.%s up.*%s.*" % (args.osdid, osd_host), output, re.DOTALL)
-  down = re.match(".*osd\.%s down.*%s.*" % (args.osdid, osd_host), output, re.DOTALL)
+  up = re.findall(r"^(osd\.%s) up.* %s:" % (args.osdid, osd_host), output, re.MULTILINE)
+  if args.out:
+    down = re.findall(r"^(osd\.%s) down.* %s:" % (args.osdid, osd_host), output, re.MULTILINE)
+    down_in = re.findall(r"^(osd\.%s) down[ ]+in.* %s:" % (args.osdid, osd_host), output, re.MULTILINE)
+    down_out = re.findall(r"^(osd\.%s) down[ ]+out.* %s:" % (args.osdid, osd_host), output, re.MULTILINE)
+  else:
+    down = re.findall(r"^(osd\.%s) down[ ]+in.* %s:" % (args.osdid, osd_host), output, re.MULTILINE)
+    down_in = down
+    down_out = re.findall(r"^(osd\.%s) down[ ]+out.* %s:" % (args.osdid, osd_host), output, re.MULTILINE)
+
+  if down:
+    print "OSD WARN: Down OSD%s on %s: %s" % ('s' if len(down)>1 else '', args.host, " ".join(down))
+    print "Up OSDs: " + " ".join(up)
+    print "Down+In OSDs: " + " ".join(down_in)
+    print "Down+Out OSDs: " + " ".join(down_out)
+    return STATUS_WARNING
 
   if up:
     print "OSD OK"
+    print "Up OSDs: " + " ".join(up)
+    print "Down+In OSDs: " + " ".join(down_in)
+    print "Down+Out OSDs: " + " ".join(down_out)
     return STATUS_OK
 
-  if down:
-    print "OSD WARN: OSD.%s is down at %s" % (args.osdid, args.host)
-    return STATUS_WARNING
-
-  print "OSD WARN: no OSD.%s found at host %s" % (args.osdid, args.host)
+  print "OSD WARN: no OSD.%s found on host %s" % (args.osdid, args.host)
   return STATUS_WARNING
 
 if __name__ == "__main__":

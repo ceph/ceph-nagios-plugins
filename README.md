@@ -52,14 +52,14 @@ Possible result includes OK (up), WARN (missing).
 
 ## check_ceph_osd
 
-The `check_ceph_osd` nagios plugin monitors an individual osd daemon, reporting its status.
+The `check_ceph_osd` nagios plugin monitors an individual osd daemon or host, reporting its status.
 
 Possible result includes OK (up), WARN (down or missing).
 
 ### Usage
 
     usage: check_ceph_osd [-h] [-e EXE] [-c CONF] [-m MONADDRESS] [-i ID]
-                         [-k KEYRING] [-V] [-I OSDID] [-H HOST]
+                         [-k KEYRING] [-V] -H HOST [-I OSDID] [-o]
 
     'ceph osd' nagios plugin.
 
@@ -73,9 +73,10 @@ Possible result includes OK (up), WARN (down or missing).
       -k KEYRING, --keyring KEYRING
                             ceph client keyring file
       -V, --version         show version and exit
+      -H HOST, --host HOST  osd host
       -I OSDID, --osdid OSDID
                             osd id
-      -H HOST, --host HOST  osd host
+      -o, --out             check osds that are set OUT
 
 ## check_ceph_rgw
 
@@ -130,6 +131,9 @@ And use this keyring with the plugin:
 
     nagios$ ./check_ceph_osd -H 172.17.0.2 -I 100
     OSD WARN: no OSD.100 found at host 172.17.0.2
+
+    nagios$ ./check_ceph_osd -H 172.17.0.2
+    OSD WARN: Down OSD on 172.17.0.2: osd.0
 
 [ceph]: http://www.ceph.com
 [cephx]: http://ceph.com/docs/master/rados/operations/authentication/
