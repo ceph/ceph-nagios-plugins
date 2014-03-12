@@ -97,9 +97,9 @@ def main():
     print "OSD ERROR: %s" % err
     return STATUS_ERROR
 
-  # else we do our checks
-  # IPv6 host
+  # escape IPv4 host address
   osd_host = args.host.replace('.', '\.')
+  # escape IPv6 host address
   osd_host = osd_host.replace('[', '\[')
   osd_host = osd_host.replace(']', '\]')
   up = re.findall(r"^(osd\.%s) up.* %s:" % (args.osdid, osd_host), output, re.MULTILINE)
