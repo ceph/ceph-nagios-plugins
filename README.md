@@ -132,5 +132,8 @@ And use this keyring with the plugin:
     nagios$ ./check_ceph_osd -H 172.17.0.2 -I 100
     OSD WARN: no OSD.100 found at host 172.17.0.2
 
+    nagios$ ./check_ceph_osd -H 172.17.0.2
+    OSD WARN: Down OSD on 172.17.0.2: osd.0
+
 [ceph]: http://www.ceph.com
 [cephx]: http://ceph.com/docs/master/rados/operations/authentication/
