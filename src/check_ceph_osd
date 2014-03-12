@@ -98,8 +98,12 @@ def main():
     return STATUS_ERROR
 
   # else we do our checks
-  up = re.match(".*osd\.%s up.*%s.*" % (args.osdid, args.host.replace('.', '\.')), output, re.DOTALL)
-  down = re.match(".*osd\.%s down.*%s.*" % (args.osdid, args.host.replace('.', '\.')), output, re.DOTALL)
+  osd_host = args.host.replace('.', '\.')
+  # IPv6 host
+  osd_host = osd_host.replace('[', '\[')
+  osd_host = osd_host.replace(']', '\]')
+  up = re.match(".*osd\.%s up.*%s.*" % (args.osdid, osd_host), output, re.DOTALL)
+  down = re.match(".*osd\.%s down.*%s.*" % (args.osdid, osd_host), output, re.DOTALL)
 
   if up:
     print "OSD OK"
