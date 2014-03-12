@@ -94,7 +94,7 @@ def main():
   output, err = p.communicate()
 
   if p.returncode != 0 or not output:
-    print "MON ERROR: %s :: %s" % (output, err)
+    print "MON ERROR: %s" % err
     return STATUS_ERROR
 
   # else we do our checks
