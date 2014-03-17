@@ -2,6 +2,18 @@
 
 A collection of nagios plugins to monitor a [Ceph][] cluster.
 
+## Authentication
+
+Ceph is normally configured to use [cephx] to authenticate its client. 
+
+To run the `check_ceph_health` or other plugins as user `nagios` you have to create a special keyring:
+
+    root# ceph auth get-or-create client.nagios mon 'allow r' > client.nagios.keyring
+
+And use this keyring with the plugin:
+
+    nagios$ ./check_ceph_health --id nagios --keyring client.nagios.keyring
+    
 ## check_ceph_health
 
 The `check_ceph_health` nagios plugin montiors the ceph cluster, and report its health.
@@ -97,18 +109,7 @@ Possible result includes OK (up), WARN (down or missing).
       -i ID, --id ID        ceph client id
       -V, --version         show version and exit
 
-## Authentication
 
-Ceph is normally configured to use [cephx] to authenticate its client. 
-
-To run the `check_ceph_health` plugin as user `nagios` you have to create a special keyring:
-
-    root# ceph auth get-or-create client.nagios mon 'allow r' > client.nagios.keyring
-
-And use this keyring with the plugin:
-
-    nagios$ ./check_ceph_health --id nagios --keyring client.nagios.keyring
-    
 ## Examples
 
     nagios$ ./check_ceph_health --id nagios --keyring client.nagios.keyring
