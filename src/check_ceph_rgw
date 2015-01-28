@@ -62,7 +62,7 @@ def main():
       rgw_cmd.append('-c')
       rgw_cmd.append(args.conf)
   if args.id:
-      rgw_cmd.append('--id')
+      rgw_cmd.append('-i')
       rgw_cmd.append(args.id)
   rgw_cmd.append('bucket')
   rgw_cmd.append('list')
