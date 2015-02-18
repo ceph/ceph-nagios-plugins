@@ -78,7 +78,23 @@ def main():
     return STATUS_ERROR
 
   bucket_stats = json.loads(output)
-  print "RGW OK: %s" % bucket_stats
+  #print bucket_stats
+  buckets = []
+  for i in bucket_stats:
+    if type(i) is dict:
+      bucket_name = i['bucket']
+      usage_dict = i['usage']
+      if not usage_dict:
+         bucket_usage_kb = 0
+      else:
+         bucket_usage_kb = usage_dict['rgw.main']['size_kb_actual']
+      buckets.append((bucket_name, bucket_usage_kb)) 
+  status = "RGW OK - %sKB Total" % sum([b[1] for b in buckets])
+  #print buckets
+  if buckets:
+     status = status + " | " + " ".join(["%s=%sKB" % (b[0],b[1]) for b in buckets])
+
+  print status
   return STATUS_OK
 
 if __name__ == "__main__":
