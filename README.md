@@ -16,7 +16,7 @@ And use this keyring with the plugin:
     
 ## check_ceph_health
 
-The `check_ceph_health` nagios plugin montiors the ceph cluster, and report its health.
+The `check_ceph_health` nagios plugin monitors the ceph cluster, and report its health.
 
 ### Usage
 
@@ -92,7 +92,7 @@ Possible result includes OK (up), WARN (down or missing).
 
 ## check_ceph_rgw
 
-The `check_ceph_rgw` nagios plugin monitors a ceph rados gateway, reporting its status.
+The `check_ceph_rgw` nagios plugin monitors a ceph rados gateway, reporting its status and buckets usage.
 
 Possible result includes OK (up), WARN (down or missing).
 
@@ -100,7 +100,7 @@ Possible result includes OK (up), WARN (down or missing).
 
     usage: check_ceph_rgw [-h] [-e EXE] [-c CONF] [-i ID] [-V]
 
-    'ceph rgw' nagios plugin.
+    'radosgw-admin bucket stats' nagios plugin.
 
     optional arguments:
       -h, --help            show this help message and exit
@@ -135,6 +135,9 @@ Possible result includes OK (up), WARN (down or missing).
 
     nagios$ ./check_ceph_osd -H 172.17.0.2
     OSD WARN: Down OSD on 172.17.0.2: osd.0
+
+    nagios$ $ ./check_ceph_rgw 
+    RGW OK - 102276KB Total | bucket-test1=148KB bucket-test0=12KB bucket-test2=102116KB
 
 [ceph]: http://www.ceph.com
 [cephx]: http://ceph.com/docs/master/rados/operations/authentication/
