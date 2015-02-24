@@ -62,11 +62,11 @@ def main():
   # build command
   rgw_cmd = [rgw_exec]
   if args.conf:
-      rgw_cmd.append('-c')
-      rgw_cmd.append(args.conf)
+    rgw_cmd.append('-c')
+    rgw_cmd.append(args.conf)
   if args.id:
-      rgw_cmd.append('-i')
-      rgw_cmd.append(args.id)
+    rgw_cmd.append('-i')
+    rgw_cmd.append(args.id)
   rgw_cmd.append('bucket')
   rgw_cmd.append('stats')
 
@@ -86,19 +86,19 @@ def main():
       bucket_name = i['bucket']
       usage_dict = i['usage']
       if not usage_dict:
-         bucket_usage_kb = 0
+        bucket_usage_kb = 0
       else:
-         bucket_usage_kb = usage_dict['rgw.main']['size_kb_actual']
+        bucket_usage_kb = usage_dict['rgw.main']['size_kb_actual']
       buckets.append((bucket_name, bucket_usage_kb))
   buckets_total_kb =  sum([b[1] for b in buckets])
   status = "RGW OK: {} buckets, {}KB total | /={}KB ".format(len(buckets),buckets_total_kb,buckets_total_kb)
   #print buckets
   if buckets and args.detail:
-     status = status + " ".join(["{}={}KB".format(b[0],b[1]) for b in buckets])
+    status = status + " ".join(["{}={}KB".format(b[0],b[1]) for b in buckets])
 
   print status
   return STATUS_OK
 
 if __name__ == "__main__":
-    sys.exit(main())
+  sys.exit(main())
 
