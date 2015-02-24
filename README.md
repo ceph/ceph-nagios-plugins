@@ -139,31 +139,13 @@ Possible result includes OK (up), WARN (down or missing).
       -i ID, --id ID        ceph client id
       -V, --version         show version and exit
 
-### Examples
+### Example
 
     nagios$ ./check_ceph_rgw
     RGW OK: 4 buckets, 102276KB total | /=102276KB
 
     nagios$ ./check_ceph_rgw --detail
     RGW OK: 4 buckets, 102276KB total | /=102276KB bucket-test1=148KB bucket-test0=12KB bucket-test2=102116KB bucket-test=0KB
-
-
-## Examples
-
-    nagios$ ./check_ceph_osd -H 172.17.0.2 -I 0
-    OSD OK
-
-    nagios$ ./check_ceph_osd -H 172.17.0.2 -I 0
-    OSD WARN: OSD.0 is down at 172.17.0.2
-
-    nagios$ ./check_ceph_osd -H 172.17.0.2 -I 100
-    OSD WARN: no OSD.100 found at host 172.17.0.2
-
-    nagios$ ./check_ceph_osd -H 172.17.0.2
-    OSD WARN: Down OSD on 172.17.0.2: osd.0
-
-    nagios$ $ ./check_ceph_rgw 
-    RGW OK - 102276KB Total | bucket-test1=148KB bucket-test0=12KB bucket-test2=102116KB
 
 [ceph]: http://www.ceph.com
 [cephx]: http://ceph.com/docs/master/rados/operations/authentication/
