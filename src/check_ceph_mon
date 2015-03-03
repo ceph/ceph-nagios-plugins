@@ -16,6 +16,7 @@
 #
 
 import argparse
+import socket
 import os
 import re
 import subprocess
@@ -71,6 +72,11 @@ def main():
   if not args.host:
     print "MON ERROR: no MON hostname given"
     return STATUS_UNKNOWN
+
+  try:
+    args.host = socket.gethostbyname(args.host)
+  except socket.gaierror:
+    print 'OSD ERROR: could not resolve %s' % args.host
 
   # build command
   ceph_cmd = [ceph_exec]
