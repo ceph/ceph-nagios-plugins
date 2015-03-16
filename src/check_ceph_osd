@@ -77,6 +77,8 @@ def main():
     args.host = socket.gethostbyname(args.host)
   except socket.gaierror:
     print 'OSD ERROR: could not resolve %s' % args.host
+    return STATUS_UNKNOWN
+
 
   # build command
   ceph_cmd = [ceph_exec]
