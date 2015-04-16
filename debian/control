@@ -3,7 +3,7 @@ Maintainer: Ricardo Rocha <ricardo@catalyst.net.nz>
 Uploaders: Sebastian Nickel <sebastian.nickel@nine.ch>
 Section: misc
 Priority: optional
-Standards-Version: 3.9.1
+Standards-Version: 3.9.5
 Build-Depends: debhelper (>= 8), python-support
 
 Package: nagios-plugins-ceph
