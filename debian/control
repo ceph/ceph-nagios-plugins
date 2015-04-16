@@ -1,5 +1,6 @@
 Source: nagios-plugins-ceph
 Maintainer: Ricardo Rocha <ricardo@catalyst.net.nz>
+Uploaders: Sebastian Nickel <sebastian.nickel@nine.ch>
 Section: misc
 Priority: optional
 Standards-Version: 3.9.1
