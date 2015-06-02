@@ -38,7 +38,7 @@ The `check_ceph_health` nagios plugin monitors the ceph cluster, and report its 
 
 ### Example
 
-    nagios$ ./check_ceph_health --name nagios --keyring client.nagios.keyring
+    nagios$ ./check_ceph_health --name client.nagios --keyring client.nagios.keyring
     HEALTH WARNING: 1 pgs degraded; 1 pgs recovering; 1 pgs stuck unclean; recovery 4448/28924462 degraded (0.015%); 2/9857830 unfound (0.000%); 
     nagios$ echo $?
     1
