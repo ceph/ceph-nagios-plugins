@@ -128,13 +128,14 @@ The `check_ceph_rgw` nagios plugin monitors a ceph rados gateway, reporting its 
 Possible result includes OK (up), WARN (down or missing).
 
 ### Usage
-    usage: check_ceph_rgw [-h] [-d] [-e EXE] [-c CONF] [-i ID] [-V]
+    usage: check_ceph_rgw [-h] [-d] [-B] [-e EXE] [-c CONF] [-i ID] [-V]
 
     'radosgw-admin bucket stats' nagios plugin.
 
     optional arguments:
       -h, --help            show this help message and exit
       -d, --detail          output perf data for all buckets
+      -B, --byte            output perf data in Byte instead of KB
       -e EXE, --exe EXE     radosgw-admin executable [/usr/bin/radosgw-admin]
       -c CONF, --conf CONF  alternative ceph conf file
       -i ID, --id ID        ceph client id
@@ -145,8 +146,8 @@ Possible result includes OK (up), WARN (down or missing).
     nagios$ ./check_ceph_rgw
     RGW OK: 4 buckets, 102276KB total | /=102276KB
 
-    nagios$ ./check_ceph_rgw --detail
-    RGW OK: 4 buckets, 102276KB total | /=102276KB bucket-test1=148KB bucket-test0=12KB bucket-test2=102116KB bucket-test=0KB
+    nagios$ ./check_ceph_rgw --detail --byte
+    RGW OK: 4 buckets, 102276KB total | /=104730624B bucket-test1=151552B bucket-test0=12288B bucket-test2=104566784B bucket-test=0B
 
 [ceph]: http://www.ceph.com
 [cephx]: http://ceph.com/docs/master/rados/operations/authentication/
