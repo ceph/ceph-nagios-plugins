@@ -144,10 +144,10 @@ Possible result includes OK (up), WARN (down or missing).
 ### Example
 
     nagios$ ./check_ceph_rgw
-    RGW OK: 4 buckets, 102276KB total | /=102276KB
+    RGW OK: 4 buckets, 102276 KB total | /=102276KB
 
     nagios$ ./check_ceph_rgw --detail --byte
-    RGW OK: 4 buckets, 102276KB total | /=104730624B bucket-test1=151552B bucket-test0=12288B bucket-test2=104566784B bucket-test=0B
+    RGW OK: 4 buckets, 102276 KB total | /=104730624B bucket-test1=151552B bucket-test0=12288B bucket-test2=104566784B bucket-test=0B
 
 [ceph]: http://www.ceph.com
 [cephx]: http://ceph.com/docs/master/rados/operations/authentication/
