@@ -53,9 +53,9 @@ Possible result includes OK (up), WARN (missing).
 ### Usage
 
     usage: check_ceph_mon [-h] [-e EXE] [-c CONF] [-m MONADDRESS] [-i ID]
-                          [-k KEYRING] [-V] [-I MONID] [-H HOST]
+                          [-k KEYRING] [-V] [-I MONID]
 
-    'ceph mon' nagios plugin.
+    'ceph quorum_status' nagios plugin.
 
     optional arguments:
       -h, --help            show this help message and exit
@@ -68,16 +68,15 @@ Possible result includes OK (up), WARN (missing).
                             ceph client keyring file
       -V, --version         show version and exit
       -I MONID, --monid MONID
-                            mon id to be checked for availability
-      -H HOST, --host HOST  mon host to be checked for availability
+                            mon ID to be checked for availability
 
 ### Example
 
-    nagios$ ./check_ceph_mon -H 172.17.0.2 -I a
+    nagios$ ./check_ceph_mon -I node1
     MON OK
 
-    nagios$ ./check_ceph_mon -H 172.17.0.2 -I b
-    MON WARN: no MON.b found at host 172.17.0.2
+    nagios$ ./check_ceph_mon --monid node2
+    MON WARN: no mon 'node2' found in quorum
 
 ## check_ceph_osd
 
