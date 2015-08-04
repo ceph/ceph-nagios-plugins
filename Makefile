@@ -29,10 +29,10 @@ nagiosconfdir = $(sysconfdir)/nagios-plugins/config
 
 tmp_dir = $(CURDIR)/tmp
 
-.PHONY: clean dist install deb
+.PHONY: clean dist install deb deb-src
 
 clean:
-	rm -rf $(tmp_dir) *.tar.gz *.deb
+	rm -rf $(tmp_dir) *.tar.gz *.deb *.dsc
 
 dist:
 	@echo "Packaging sources"
@@ -54,12 +54,20 @@ install:
 	install -d $(DESTDIR)$(nagiosconfdir)
 	install -m 0644 config/* $(DESTDIR)$(nagiosconfdir)
 
-deb: dist
-	@echo "Debian packaging..."
+pre_deb: dist
 	mkdir -p $(tmp_dir)
 	cp $(name)-$(version).tar.gz $(tmp_dir)/$(name)_$(version).orig.tar.gz
 	tar -C $(tmp_dir) -xzf $(tmp_dir)/$(name)_$(version).orig.tar.gz
-	cd $(tmp_dir)/$(name)-$(version); debuild -uc -us
+
+deb-src: pre_deb
+	@echo "Debian source package..."
+	cd $(tmp_dir) && dpkg-source -b $(name)-$(version)
+	cp $(tmp_dir)/$(name)_$(version)* .
+	rm -rf $(tmp_dir)
+
+deb: pre_deb
+	@echo "Debian package..."
+	cd $(tmp_dir)/$(name)-$(version) && debuild -uc -us
 	cp $(tmp_dir)/$(name)*.deb .
 	rm -rf $(tmp_dir)
 
