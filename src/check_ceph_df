@@ -1,0 +1,155 @@
+#!/usr/bin/env python
+#
+#  Copyright (c) 2013 SWITCH http://www.switch.ch
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+
+import argparse
+import os
+import subprocess
+import sys
+
+__version__ = '1.0.1'
+
+# default ceph values
+CEPH_COMMAND = '/usr/bin/ceph'
+
+# nagios exit code
+STATUS_OK = 0
+STATUS_WARNING = 1
+STATUS_ERROR = 2
+STATUS_UNKNOWN = 3
+
+def main():
+
+    # parse args
+    parser = argparse.ArgumentParser(description="'ceph df' nagios plugin.")
+    parser.add_argument('-e','--exe', help='ceph executable [%s]' % CEPH_COMMAND)
+    parser.add_argument('-c','--conf', help='alternative ceph conf file')
+    parser.add_argument('-m','--monaddress', help='ceph monitor address[:port]')    
+    parser.add_argument('-i','--id', help='ceph client id')
+    parser.add_argument('-n','--name', help='ceph client name')
+    parser.add_argument('-k','--keyring', help='ceph client keyring file')
+    parser.add_argument('-d','--detail', help="show pool details on warn and critical", action='store_true')
+    parser.add_argument('-W','--warn', help="warn above this percent RAW USED")
+    parser.add_argument('-C','--critical', help="critical alert above this percent RAW USED")
+    parser.add_argument('-V','--version', help='show version and exit', action='store_true')
+    args = parser.parse_args()
+   
+    # validate args
+    ceph_exec = args.exe if args.exe else CEPH_COMMAND
+    if not os.path.exists(ceph_exec):
+        print "ERROR: ceph executable '%s' doesn't exist" % ceph_exec
+        return STATUS_UNKNOWN
+    
+    if args.version:
+        print 'version %s' % __version__
+        return STATUS_OK
+
+    if args.conf and not os.path.exists(args.conf):
+        print "ERROR: ceph conf file '%s' doesn't exist" % args.conf
+        return STATUS_UNKNOWN
+    
+    if args.keyring and not os.path.exists(args.keyring):
+        print "ERROR: keyring file '%s' doesn't exist" % args.keyring
+        return STATUS_UNKNOWN
+
+    if args.warn > args.critical or not args.warn or not args.critical:
+        print "ERROR: warn and critical level must be set and critical must be greater than warn"
+        return STATUS_UNKNOWN
+    
+    # build command
+    ceph_df = [ceph_exec]
+    if args.monaddress:
+        ceph_df.append('-m')
+        ceph_df.append(args.monaddress)
+    if args.conf:
+        ceph_df.append('-c')
+        ceph_df.append(args.conf)
+    if args.id:
+        ceph_df.append('--id')
+        ceph_df.append(args.id)
+    if args.name:
+        ceph_df.append('--name')
+        ceph_df.append(args.name)
+    if args.keyring:
+        ceph_df.append('--keyring')
+        ceph_df.append(args.keyring)
+    ceph_df.append('df')
+
+    #print ceph_df
+    
+    # exec command
+    p = subprocess.Popen(ceph_df,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    output, err = p.communicate()
+    
+    # parse output
+    # print "DEBUG: output:", output
+    # print "DEBUG: err:", err
+    if output:
+        # parse output
+        # if detail switch was not set only show global values and compare to warning and critical
+        # otherwise show space for pools too
+        result=output.splitlines()
+        # values for GLOBAL are in 3rd line of output
+        globalline = result[2]
+        globalvals = globalline.split(' ')
+        # strip all empty values from list
+        globalvals = [x for x in globalvals if x != '']
+
+        # prepare pool values
+        # pool output starts in line 4 with the bare word POOLS: followed by the output
+        poolline = result[3:]
+        # print 'DEBUG:', globalvals
+        # finally 4th element contains percentual value
+        # print 'DEBUG USAGE:', globalvals[3]
+        global_usage_percent = globalvals[3]
+        global_available_space = globalvals[1]
+        global_total_space = globalvals[0]
+        # print 'DEBUG WARNLEVEL:', args.warn
+        # print 'DEBUG CRITICALLEVEL:', args.critical
+        if global_usage_percent > args.critical:
+            if args.detail:
+                    poolline.insert(0, '\n')
+                    poolout = '\n '.join(poolline)
+            else:
+                    poolout = ''
+            print 'CRITICAL: global RAW usage of %s%% is above %s%% (%s of %s free)%s' % (global_usage_percent, args.critical, global_available_space, global_total_space, poolout)
+            return STATUS_ERROR
+        elif global_usage_percent > args.warn:
+            if args.detail:
+                    poolline.insert(0, '\n')
+                    poolout = '\n '.join(poolline)
+            else:
+                    poolout = ''
+            print 'WARNING: global RAW usage of %s%% is above %s%% (%s of %s free)%s' % (global_usage_percent, args.warn, global_available_space, global_total_space, poolout)
+            return STATUS_WARNING 
+        else:
+            print 'RAW usage %s%%' % global_usage_percent
+            return STATUS_OK
+    elif err:
+        # read only first line of error
+        one_line = err.split('\n')[0]
+        if '-1 ' in one_line:
+            idx = one_line.rfind('-1 ')
+            print 'ERROR: %s: %s' % (ceph_exec, one_line[idx+len('-1 '):])
+        else:
+            print one_line
+    
+    return STATUS_UNKNOWN
+
+
+if __name__ == "__main__":
+    sys.exit(main())
+
