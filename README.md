@@ -148,5 +148,51 @@ Possible result includes OK (up), WARN (down or missing).
     nagios$ ./check_ceph_rgw --detail --byte
     RGW OK: 4 buckets, 102276 KB total | /=104730624B bucket-test1=151552B bucket-test0=12288B bucket-test2=104566784B bucket-test=0B
 
+## check_ceph_df
+
+The `check_ceph_df` nagios plugin monitors a ceph cluster, reporting its percentual RAW capacity usage.
+
+Possible result includes OK, WARN and CRITICAL.
+
+### Usage
+	usage: check_ceph_df [-h] [-e EXE] [-c CONF] [-m MONADDRESS] [-i ID] [-n NAME]
+						 [-k KEYRING] [-d] [-W WARN] [-C CRITICAL] [-V]
+
+	'ceph df' nagios plugin.
+
+	optional arguments:
+	  -h, --help            show this help message and exit
+	  -e EXE, --exe EXE     ceph executable [/usr/bin/ceph]
+	  -c CONF, --conf CONF  alternative ceph conf file
+	  -m MONADDRESS, --monaddress MONADDRESS
+							ceph monitor address[:port]
+	  -i ID, --id ID        ceph client id
+	  -n NAME, --name NAME  ceph client name
+	  -k KEYRING, --keyring KEYRING
+							ceph client keyring file
+	  -d, --detail          show pool details on warn and critical
+	  -W WARN, --warn WARN  warn above this percent RAW USED
+	  -C CRITICAL, --critical CRITICAL
+							critical alert above this percent RAW USED
+	  -V, --version         show version and exit
+
+### Example
+
+    nagios$ ./check_ceph_df -i nagios -k /etc/ceph/client.nagios.keyring -W 29.12 -C 30.22 -d
+	RAW usage 28.36%
+
+    nagios$ ./check_ceph_df -i nagios -k /etc/ceph/client.nagios.keyring -W 26.14 -C 30
+    WARNING: global RAW usage of 28.36% is above 26.14% (783G of 1093G free)
+
+    nagios$ ./check_ceph_df -i nagios -k /etc/ceph/client.nagios.keyring -W 26.14 -C 30 -d
+	WARNING: global RAW usage of 28.36% is above 26.14% (783G of 1093G free)
+
+	 POOLS:
+		 NAME                ID     USED       %USED     MAX AVAIL     OBJECTS
+		 rbd                 0      96137M      8.59          348G       24441
+		 cephfs_data         1      61785M      5.52          348G       99940
+		 cephfs_metadata     2      40380k         0          348G        8037
+		 libvirt-pool        3         145         0          348G           2
+
 [ceph]: http://www.ceph.com
 [cephx]: http://ceph.com/docs/master/rados/operations/authentication/
