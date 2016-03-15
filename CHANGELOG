@@ -1,5 +1,8 @@
 Nagios plugins for Ceph
 -----------------------
+Version 1.5.0:
+* check_ceph_df plugin added.
+
 Version 1.4.0:
 * Refactored check_ceph_mon plugin (v1.1.0), parses ceph quorum_status output.
 
