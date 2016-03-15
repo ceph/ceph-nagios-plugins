@@ -17,7 +17,7 @@
 #     Ricardo Rocha <ricardo@catalyst.net.nz>
 
 name = nagios-plugins-ceph
-version = 1.4.0
+version = 1.5.0
 
 # install options (like configure)
 # ex: make sysconfdir=/etc libdir=/usr/lib64 sysconfdir=/etc install
