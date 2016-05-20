@@ -114,7 +114,7 @@ def main():
         # print 'DEBUG:', globalvals
         # finally 4th element contains percentual value
         # print 'DEBUG USAGE:', globalvals[3]
-        global_usage_percent = globalvals[3]
+        global_usage_percent = float(globalvals[3])
         global_available_space = globalvals[1]
         global_total_space = globalvals[0]
         # print 'DEBUG WARNLEVEL:', args.warn
