@@ -23,7 +23,7 @@ import subprocess
 import sys
 import json
 
-__version__ = '1.2.0'
+__version__ = '1.5.0'
 
 # default ceph values
 RGW_COMMAND = '/usr/bin/radosgw-admin'
@@ -39,18 +39,19 @@ def main():
   # parse args
   parser = argparse.ArgumentParser(description="'radosgw-admin bucket stats' nagios plugin.")
   parser.add_argument('-d','--detail', help='output perf data for all buckets', action='store_true')
+  parser.add_argument('-B','--byte', help='output perf data in Byte instead of KB', action='store_true')
   parser.add_argument('-e','--exe', help='radosgw-admin executable [%s]' % RGW_COMMAND)
   parser.add_argument('-c','--conf', help='alternative ceph conf file')
   parser.add_argument('-i','--id', help='ceph client id')
   parser.add_argument('-V','--version', help='show version and exit', action='store_true')
   args = parser.parse_args()
- 
+
   # validate args
   rgw_exec = args.exe if args.exe else RGW_COMMAND
   if not os.path.exists(rgw_exec):
     print "RGW ERROR: radosgw-admin executable '%s' doesn't exist" % rgw_exec
     return STATUS_UNKNOWN
-  
+
   if args.version:
     print 'version %s' % __version__
     return STATUS_OK
@@ -58,7 +59,7 @@ def main():
   if args.conf and not os.path.exists(args.conf):
     print "RGW ERROR: ceph conf file '%s' doesn't exist" % args.conf
     return STATUS_UNKNOWN
-  
+
   # build command
   rgw_cmd = [rgw_exec]
   if args.conf:
@@ -91,10 +92,16 @@ def main():
         bucket_usage_kb = usage_dict['rgw.main']['size_kb_actual']
       buckets.append((bucket_name, bucket_usage_kb))
   buckets_total_kb =  sum([b[1] for b in buckets])
-  status = "RGW OK: {} buckets, {}KB total | /={}KB ".format(len(buckets),buckets_total_kb,buckets_total_kb)
+  if args.byte:
+    status = "RGW OK: {} buckets, {} KB total | /={}B ".format(len(buckets),buckets_total_kb,buckets_total_kb*1024)
+  else:
+    status = "RGW OK: {} buckets, {} KB total | /={}KB ".format(len(buckets),buckets_total_kb,buckets_total_kb)
   #print buckets
   if buckets and args.detail:
-    status = status + " ".join(["{}={}KB".format(b[0],b[1]) for b in buckets])
+    if args.byte:
+      status = status + " ".join(["{}={}B".format(b[0],b[1]*1024) for b in buckets])
+    else:
+      status = status + " ".join(["{}={}KB".format(b[0],b[1]) for b in buckets])
 
   print status
   return STATUS_OK
