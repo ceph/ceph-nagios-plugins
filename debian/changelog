@@ -1,4 +1,9 @@
-=======
+nagios-plugins-ceph (1.5.1-1) unstable; urgency=medium
+
+  * added whitelist parsing for check_ceph_health
+
+ -- Roman Plessl <roman.plessl@nine.ch>  Mon, 27 Jun 2016 14:40:18 +0100
+
 nagios-plugins-ceph (1.5.0-1) unstable; urgency=medium
 
   * Upstream version 1.5.0
