@@ -19,6 +19,7 @@ import argparse
 import os
 import subprocess
 import sys
+import re
 
 __version__ = '1.5.1'
 
@@ -106,7 +107,10 @@ def main():
                 print 'HEALTH OK'
             return STATUS_OK
         elif one_line.startswith('HEALTH_WARN'):
-            whitelist_match = re.match(args.whitelist, one_line)
+            whitelist_regexp = 'NON WHITELIST REGEXP'
+            if args.whitelist:
+                whitelist_regexp = args.whitelist
+            whitelist_match = re.search(whitelist_regexp, one_line)
             if whitelist_match:
                 print 'HEALTH OK'
                 return STATUS_OK
