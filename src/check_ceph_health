@@ -20,7 +20,7 @@ import os
 import subprocess
 import sys
 
-__version__ = '1.0.1'
+__version__ = '1.5.90'
 
 # default ceph values
 CEPH_COMMAND = '/usr/bin/ceph'
@@ -37,20 +37,21 @@ def main():
     parser = argparse.ArgumentParser(description="'ceph health' nagios plugin.")
     parser.add_argument('-e','--exe', help='ceph executable [%s]' % CEPH_COMMAND)
     parser.add_argument('-c','--conf', help='alternative ceph conf file')
-    parser.add_argument('-m','--monaddress', help='ceph monitor address[:port]')    
+    parser.add_argument('-m','--monaddress', help='ceph monitor address[:port]')
     parser.add_argument('-i','--id', help='ceph client id')
     parser.add_argument('-n','--name', help='ceph client name')
     parser.add_argument('-k','--keyring', help='ceph client keyring file')
+    parser.add_argument('-w','--whitelist', help='whitelist regexp for ceph health warnings')
     parser.add_argument('-d','--detail', help="exec 'ceph health detail'", action='store_true')
     parser.add_argument('-V','--version', help='show version and exit', action='store_true')
     args = parser.parse_args()
-   
+
     # validate args
     ceph_exec = args.exe if args.exe else CEPH_COMMAND
     if not os.path.exists(ceph_exec):
         print "ERROR: ceph executable '%s' doesn't exist" % ceph_exec
         return STATUS_UNKNOWN
-    
+
     if args.version:
         print 'version %s' % __version__
         return STATUS_OK
@@ -58,11 +59,11 @@ def main():
     if args.conf and not os.path.exists(args.conf):
         print "ERROR: ceph conf file '%s' doesn't exist" % args.conf
         return STATUS_UNKNOWN
-    
+
     if args.keyring and not os.path.exists(args.keyring):
         print "ERROR: keyring file '%s' doesn't exist" % args.keyring
         return STATUS_UNKNOWN
-    
+
     # build command
     ceph_health = [ceph_exec]
     if args.monaddress:
@@ -85,11 +86,11 @@ def main():
         ceph_health.append('detail')
 
     #print ceph_health
-    
+
     # exec command
     p = subprocess.Popen(ceph_health,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     output, err = p.communicate()
-    
+
     # parse output
     #print "output:", output
     #print "err:", err
@@ -105,14 +106,19 @@ def main():
                 print 'HEALTH OK'
             return STATUS_OK
         elif one_line.startswith('HEALTH_WARN'):
-            print 'HEALTH WARNING:', one_line[len('HEALTH_WARN')+1:]
-            return STATUS_WARNING
+            whitelist_match = re.match(args.whitelist, one_line)
+            if whitelist_match:
+                print 'HEALTH OK'
+                return STATUS_OK
+            else:
+                print 'HEALTH WARNING:', one_line[len('HEALTH_WARN')+1:]
+                return STATUS_WARNING
         elif one_line.startswith('HEALTH_ERR'):
             print 'HEALTH ERROR:', one_line[len('HEALTH_ERR')+1:]
             return STATUS_ERROR
         else:
             print one_line
-        
+
     elif err:
         # read only first line of error
         one_line = err.split('\n')[0]
@@ -121,7 +127,7 @@ def main():
             print 'ERROR: %s: %s' % (ceph_exec, one_line[idx+len('-1 '):])
         else:
             print one_line
-    
+
     return STATUS_UNKNOWN
 
 

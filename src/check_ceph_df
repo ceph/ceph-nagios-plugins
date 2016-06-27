@@ -20,7 +20,7 @@ import os
 import subprocess
 import sys
 
-__version__ = '1.0.1'
+__version__ = '1.5.0'
 
 # default ceph values
 CEPH_COMMAND = '/usr/bin/ceph'
@@ -37,7 +37,7 @@ def main():
     parser = argparse.ArgumentParser(description="'ceph df' nagios plugin.")
     parser.add_argument('-e','--exe', help='ceph executable [%s]' % CEPH_COMMAND)
     parser.add_argument('-c','--conf', help='alternative ceph conf file')
-    parser.add_argument('-m','--monaddress', help='ceph monitor address[:port]')    
+    parser.add_argument('-m','--monaddress', help='ceph monitor address[:port]')
     parser.add_argument('-i','--id', help='ceph client id')
     parser.add_argument('-n','--name', help='ceph client name')
     parser.add_argument('-k','--keyring', help='ceph client keyring file')
@@ -46,13 +46,13 @@ def main():
     parser.add_argument('-C','--critical', help="critical alert above this percent RAW USED")
     parser.add_argument('-V','--version', help='show version and exit', action='store_true')
     args = parser.parse_args()
-   
+
     # validate args
     ceph_exec = args.exe if args.exe else CEPH_COMMAND
     if not os.path.exists(ceph_exec):
         print "ERROR: ceph executable '%s' doesn't exist" % ceph_exec
         return STATUS_UNKNOWN
-    
+
     if args.version:
         print 'version %s' % __version__
         return STATUS_OK
@@ -60,7 +60,7 @@ def main():
     if args.conf and not os.path.exists(args.conf):
         print "ERROR: ceph conf file '%s' doesn't exist" % args.conf
         return STATUS_UNKNOWN
-    
+
     if args.keyring and not os.path.exists(args.keyring):
         print "ERROR: keyring file '%s' doesn't exist" % args.keyring
         return STATUS_UNKNOWN
@@ -68,7 +68,7 @@ def main():
     if args.warn > args.critical or not args.warn or not args.critical:
         print "ERROR: warn and critical level must be set and critical must be greater than warn"
         return STATUS_UNKNOWN
-    
+
     # build command
     ceph_df = [ceph_exec]
     if args.monaddress:
@@ -89,11 +89,11 @@ def main():
     ceph_df.append('df')
 
     #print ceph_df
-    
+
     # exec command
     p = subprocess.Popen(ceph_df,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     output, err = p.communicate()
-    
+
     # parse output
     # print "DEBUG: output:", output
     # print "DEBUG: err:", err
@@ -134,7 +134,7 @@ def main():
             else:
                     poolout = ''
             print 'WARNING: global RAW usage of %s%% is above %s%% (%s of %s free)%s' % (global_usage_percent, args.warn, global_available_space, global_total_space, poolout)
-            return STATUS_WARNING 
+            return STATUS_WARNING
         else:
             print 'RAW usage %s%%' % global_usage_percent
             return STATUS_OK
@@ -146,7 +146,7 @@ def main():
             print 'ERROR: %s: %s' % (ceph_exec, one_line[idx+len('-1 '):])
         else:
             print one_line
-    
+
     return STATUS_UNKNOWN
 
 
