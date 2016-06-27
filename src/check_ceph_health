@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-#  Copyright (c) 2013 SWITCH http://www.switch.ch
+#  Copyright (c) 2013-2016 SWITCH http://www.switch.ch
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -107,16 +107,12 @@ def main():
                 print 'HEALTH OK'
             return STATUS_OK
         elif one_line.startswith('HEALTH_WARN'):
-            whitelist_regexp = 'NON WHITELIST REGEXP'
-            if args.whitelist:
-                whitelist_regexp = args.whitelist
-            whitelist_match = re.search(whitelist_regexp, one_line)
-            if whitelist_match:
+            if args.whitelist && re.search(args.whitelist, one_line):
                 print 'HEALTH OK'
                 return STATUS_OK
-            else:
-                print 'HEALTH WARNING:', one_line[len('HEALTH_WARN')+1:]
-                return STATUS_WARNING
+
+            print 'HEALTH WARNING:', one_line[len('HEALTH_WARN')+1:]
+            return STATUS_WARNING
         elif one_line.startswith('HEALTH_ERR'):
             print 'HEALTH ERROR:', one_line[len('HEALTH_ERR')+1:]
             return STATUS_ERROR
