@@ -107,7 +107,7 @@ def main():
                 print 'HEALTH OK'
             return STATUS_OK
         elif one_line.startswith('HEALTH_WARN'):
-            if args.whitelist && re.search(args.whitelist, one_line):
+            if args.whitelist and re.search(args.whitelist, one_line):
                 print 'HEALTH OK'
                 return STATUS_OK
 
