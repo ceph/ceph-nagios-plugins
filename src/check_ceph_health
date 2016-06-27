@@ -39,6 +39,7 @@ def main():
     parser.add_argument('-c','--conf', help='alternative ceph conf file')
     parser.add_argument('-m','--monaddress', help='ceph monitor address[:port]')    
     parser.add_argument('-i','--id', help='ceph client id')
+    parser.add_argument('-n','--name', help='ceph client name')
     parser.add_argument('-k','--keyring', help='ceph client keyring file')
     parser.add_argument('-d','--detail', help="exec 'ceph health detail'", action='store_true')
     parser.add_argument('-V','--version', help='show version and exit', action='store_true')
@@ -73,6 +74,9 @@ def main():
     if args.id:
         ceph_health.append('--id')
         ceph_health.append(args.id)
+    if args.name:
+        ceph_health.append('--name')
+        ceph_health.append(args.name)
     if args.keyring:
         ceph_health.append('--keyring')
         ceph_health.append(args.keyring)
