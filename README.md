@@ -4,7 +4,7 @@ A collection of nagios plugins to monitor a [Ceph][] cluster.
 
 ## Authentication
 
-Ceph is normally configured to use [cephx] to authenticate its client. 
+Ceph is normally configured to use [cephx] to authenticate its client.
 
 To run the `check_ceph_health` or other plugins as user `nagios` you have to create a special keyring:
 
@@ -13,14 +13,14 @@ To run the `check_ceph_health` or other plugins as user `nagios` you have to cre
 And use this keyring with the plugin:
 
     nagios$ ./check_ceph_health --id nagios --keyring client.nagios.keyring
-    
+
 ## check_ceph_health
 
 The `check_ceph_health` nagios plugin monitors the ceph cluster, and report its health.
 
 ### Usage
 
-    usage: check_ceph_health [-h] [-e EXE] [-c CONF] [-m MONADDRESS] [-n NAME] [-i ID] [-k KEYRING] [-d]
+    usage: check_ceph_health [-h] [-e EXE] [-c CONF] [-m MONADDRESS] [-n NAME] [-i ID] [-k KEYRING] [-w WHITELIST] [-d]
 
     'ceph health' nagios plugin.
 
@@ -34,15 +34,21 @@ The `check_ceph_health` nagios plugin monitors the ceph cluster, and report its 
       -n ID, --name NAME    ceph client name
       -k KEYRING, --keyring KEYRING
                             ceph client keyring file
+      -w, --whitelist REGEXP
+                            whitelist regexp for ceph health warnings
       -d, --detail          exec 'ceph health detail'
+      -V, --version         show version and exit
 
 ### Example
 
     nagios$ ./check_ceph_health --name client.nagios --keyring client.nagios.keyring
-    HEALTH WARNING: 1 pgs degraded; 1 pgs recovering; 1 pgs stuck unclean; recovery 4448/28924462 degraded (0.015%); 2/9857830 unfound (0.000%); 
+    HEALTH WARNING: 1 pgs degraded; 1 pgs recovering; 1 pgs stuck unclean; recovery 4448/28924462 degraded (0.015%); 2/9857830 unfound (0.000%);
     nagios$ echo $?
     1
     nagios$
+
+    nagios$ ./check_ceph_health --id nagios --whitelist 'requests.are.blocked(\s)*32.sec'
+
 
 ## check_ceph_mon
 
