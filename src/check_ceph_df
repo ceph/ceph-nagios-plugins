@@ -42,8 +42,8 @@ def main():
     parser.add_argument('-n','--name', help='ceph client name')
     parser.add_argument('-k','--keyring', help='ceph client keyring file')
     parser.add_argument('-d','--detail', help="show pool details on warn and critical", action='store_true')
-    parser.add_argument('-W','--warn', help="warn above this percent RAW USED")
-    parser.add_argument('-C','--critical', help="critical alert above this percent RAW USED")
+    parser.add_argument('-W','--warn', help="warn above this percent RAW USED", type=float)
+    parser.add_argument('-C','--critical', help="critical alert above this percent RAW USED", type=float)
     parser.add_argument('-V','--version', help='show version and exit', action='store_true')
     args = parser.parse_args()
 
