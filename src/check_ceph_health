@@ -21,7 +21,7 @@ import subprocess
 import sys
 import re
 
-__version__ = '1.5.1'
+__version__ = '1.5.2'
 
 # default ceph values
 CEPH_COMMAND = '/usr/bin/ceph'
@@ -37,6 +37,7 @@ def main():
     # parse args
     parser = argparse.ArgumentParser(description="'ceph health' nagios plugin.")
     parser.add_argument('-e','--exe', help='ceph executable [%s]' % CEPH_COMMAND)
+    parser.add_argument('--cluster', help='ceph cluster name')
     parser.add_argument('-c','--conf', help='alternative ceph conf file')
     parser.add_argument('-m','--monaddress', help='ceph monitor address[:port]')
     parser.add_argument('-i','--id', help='ceph client id')
@@ -70,6 +71,9 @@ def main():
     if args.monaddress:
         ceph_health.append('-m')
         ceph_health.append(args.monaddress)
+    if args.cluster:
+        ceph_health.append('--cluster')
+        ceph_health.append(args.cluster)
     if args.conf:
         ceph_health.append('-c')
         ceph_health.append(args.conf)
