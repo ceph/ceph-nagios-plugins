@@ -126,6 +126,7 @@ def main():
     print "Up OSDs: " + " ".join(up)
     print "Down+In OSDs: " + " ".join(down_in)
     print "Down+Out OSDs: " + " ".join(down_out)
+    print "| 'osd_up'=%d 'osd_down_in'=%d;;%d 'osd_down_out'=%d;;%d" % (len(up), len(down_in), args.crit, len(down_out), args.crit)
     if len(down)>=args.crit:
       return STATUS_ERROR
     else:
@@ -136,6 +137,7 @@ def main():
     print "Up OSDs: " + " ".join(up)
     print "Down+In OSDs: " + " ".join(down_in)
     print "Down+Out OSDs: " + " ".join(down_out)
+    print "| 'osd_up'=%d 'osd_down_in'=%d;;%d 'osd_down_out'=%d;;%d" % (len(up), len(down_in), args.crit, len(down_out), args.crit)
     return STATUS_OK
 
   print "OSD WARN: no OSD.%s found on host %s" % (args.osdid, args.host)
