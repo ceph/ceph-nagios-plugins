@@ -20,7 +20,7 @@ import os
 import subprocess
 import sys
 
-__version__ = '1.5.0'
+__version__ = '1.5.1'
 
 # default ceph values
 CEPH_COMMAND = '/usr/bin/ceph'
@@ -41,6 +41,7 @@ def main():
     parser.add_argument('-i','--id', help='ceph client id')
     parser.add_argument('-n','--name', help='ceph client name')
     parser.add_argument('-k','--keyring', help='ceph client keyring file')
+    parser.add_argument('-p','--pool', help='ceph pool name')
     parser.add_argument('-d','--detail', help="show pool details on warn and critical", action='store_true')
     parser.add_argument('-W','--warn', help="warn above this percent RAW USED", type=float)
     parser.add_argument('-C','--critical', help="critical alert above this percent RAW USED", type=float)
@@ -110,34 +111,57 @@ def main():
 
         # prepare pool values
         # pool output starts in line 4 with the bare word POOLS: followed by the output
-        poolline = result[3:]
-        # print 'DEBUG:', globalvals
-        # finally 4th element contains percentual value
-        # print 'DEBUG USAGE:', globalvals[3]
-        global_usage_percent = float(globalvals[3])
-        global_available_space = globalvals[1]
-        global_total_space = globalvals[0]
-        # print 'DEBUG WARNLEVEL:', args.warn
-        # print 'DEBUG CRITICALLEVEL:', args.critical
-        if global_usage_percent > args.critical:
-            if args.detail:
-                    poolline.insert(0, '\n')
-                    poolout = '\n '.join(poolline)
-            else:
-                    poolout = ''
-            print 'CRITICAL: global RAW usage of %s%% is above %s%% (%s of %s free)%s' % (global_usage_percent, args.critical, global_available_space, global_total_space, poolout)
-            return STATUS_ERROR
-        elif global_usage_percent > args.warn:
-            if args.detail:
-                    poolline.insert(0, '\n')
-                    poolout = '\n '.join(poolline)
-            else:
-                    poolout = ''
-            print 'WARNING: global RAW usage of %s%% is above %s%% (%s of %s free)%s' % (global_usage_percent, args.warn, global_available_space, global_total_space, poolout)
-            return STATUS_WARNING
+        poollines = result[3:]
+
+        if args.pool:
+            for line in poollines:
+                if args.pool in line:
+                    poolvals = [x for x in line.split(' ') if x != '']
+
+                    pool_used = poolvals[2]
+                    pool_usage_percent = float(poolvals[3])
+                    pool_available_space = poolvals[4]
+                    pool_objects = float(poolvals[5])
+
+                    if pool_usage_percent > args.critical:
+                        print 'CRITICAL: Pool \'%s\' usage of %s%% is above %s%% (%s used)' % (args.pool, pool_usage_percent, args.critical, pool_used)
+                        return STATUS_ERROR
+                    if pool_usage_percent > args.warn:
+                        print 'WARNING: Pool \'%s\' usage of %s%% is above %s%% (%s used)' % (args.pool, pool_usage_percent, args.warn, pool_used)
+                        return STATUS_WARNING    
+                    else: 
+                        print 'Pool \'%s\' usage %s%%' % (args.pool, pool_usage_percent)
+                        return STATUS_OK  
         else:
-            print 'RAW usage %s%%' % global_usage_percent
-            return STATUS_OK
+            # print 'DEBUG:', globalvals
+            # finally 4th element contains percentual value
+            # print 'DEBUG USAGE:', globalvals[3]
+            global_usage_percent = float(globalvals[3])
+            global_available_space = globalvals[1]
+            global_total_space = globalvals[0]
+            # print 'DEBUG WARNLEVEL:', args.warn
+            # print 'DEBUG CRITICALLEVEL:', args.critical
+            if global_usage_percent > args.critical:
+                if args.detail:
+                        poolline.insert(0, '\n')
+                        poolout = '\n '.join(poolline)
+                else:
+                        poolout = ''
+                print 'CRITICAL: global RAW usage of %s%% is above %s%% (%s of %s free)%s' % (global_usage_percent, args.critical, global_available_space, global_total_space, poolout)
+                return STATUS_ERROR
+            elif global_usage_percent > args.warn:
+                if args.detail:
+                        poolline.insert(0, '\n')
+                        poolout = '\n '.join(poolline)
+                else:
+                        poolout = ''
+                print 'WARNING: global RAW usage of %s%% is above %s%% (%s of %s free)%s' % (global_usage_percent, args.warn, global_available_space, global_total_space, poolout)
+                return STATUS_WARNING
+            else:
+                print 'RAW usage %s%%' % global_usage_percent
+                return STATUS_OK
+
+        #for 
     elif err:
         # read only first line of error
         one_line = err.split('\n')[0]
