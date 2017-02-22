@@ -156,7 +156,7 @@ Possible result includes OK (up), WARN (down or missing).
 
 ## check_ceph_df
 
-The `check_ceph_df` nagios plugin monitors a ceph cluster, reporting its percentual RAW capacity usage.
+The `check_ceph_df` nagios plugin monitors a ceph cluster, reporting its percentual RAW capacity usage, or specific pool usage.
 
 Possible result includes OK, WARN and CRITICAL.
 
@@ -176,6 +176,7 @@ Possible result includes OK, WARN and CRITICAL.
 	  -n NAME, --name NAME  ceph client name
 	  -k KEYRING, --keyring KEYRING
 							ceph client keyring file
+	  -p POOL, --pool POOL  ceph pool name
 	  -d, --detail          show pool details on warn and critical
 	  -W WARN, --warn WARN  warn above this percent RAW USED
 	  -C CRITICAL, --critical CRITICAL
@@ -189,6 +190,12 @@ Possible result includes OK, WARN and CRITICAL.
 
     nagios$ ./check_ceph_df -i nagios -k /etc/ceph/client.nagios.keyring -W 26.14 -C 30
     WARNING: global RAW usage of 28.36% is above 26.14% (783G of 1093G free)
+
+    nagios$ ./check_ceph_df -i nagios -k /etc/ceph/client.nagios.keyring -W 60 -C 70 -p hdd
+    CRITICAL: Pool 'hdd' usage of 71.71% is above 70.0% (9703G used)
+
+    nagios$ ./check_ceph_df -i nagios -k /etc/ceph/client.nagios.keyring -W 60 -C 70 -p nvme
+    CRITICAL: Pool 'nvme' usage of 76.08% is above 70.0% (223G used)
 
     nagios$ ./check_ceph_df -i nagios -k /etc/ceph/client.nagios.keyring -W 26.14 -C 30 -d
 	WARNING: global RAW usage of 28.36% is above 26.14% (783G of 1093G free)
