@@ -1,0 +1,181 @@
+#!/usr/bin/env python
+#
+#  Copyright (c) 2013 Catalyst IT http://www.catalyst.net.nz
+#  Copyright (c) 2015 SWITCH http://www.switch.ch
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+
+import argparse
+import socket
+import os
+import re
+import subprocess
+import sys
+import json
+
+__version__ = '1.5.0'
+
+# default ceph values
+CEPH_EXEC = '/usr/bin/ceph'
+CEPH_COMMAND = 'mds stat -f json'
+
+# nagios exit code
+STATUS_OK = 0
+STATUS_WARNING = 1
+STATUS_ERROR = 2
+STATUS_UNKNOWN = 3
+
+def main():
+    # parse args
+    parser = argparse.ArgumentParser(description="'ceph mds stat' nagios plugin.")
+    parser.add_argument('-e','--exe', help='ceph executable [%s]' % CEPH_EXEC)
+    parser.add_argument('-c','--conf', help='alternative ceph conf file')
+    parser.add_argument('-m','--monaddress', help='ceph monitor to use for queries (address[:port])')
+    parser.add_argument('-i','--id', help='ceph client id')
+    parser.add_argument('-k','--keyring', help='ceph client keyring file')
+    parser.add_argument('-V','--version', help='show version and exit', action='store_true')
+    parser.add_argument('-n','--name', help='mds daemon name', required=True)
+    parser.add_argument('-f','--filesystem', help='mds filesystem name', required=True)
+    args = parser.parse_args()
+
+    if args.version:
+        print 'version %s' % __version__
+        return STATUS_OK
+
+    # validate args
+    ceph_exec = args.exe if args.exe else CEPH_EXEC
+    if not os.path.exists(ceph_exec):
+        print "MDS ERROR: ceph executable '%s' doesn't exist" % ceph_exec
+        return STATUS_UNKNOWN
+
+    if args.conf and not os.path.exists(args.conf):
+        print "MDS ERROR: ceph conf file '%s' doesn't exist" % args.conf
+        return STATUS_UNKNOWN
+
+    if args.keyring and not os.path.exists(args.keyring):
+        print "MDS ERROR: keyring file '%s' doesn't exist" % args.keyring
+        return STATUS_UNKNOWN
+
+    # build command
+    ceph_cmd = [ceph_exec]
+    if args.monaddress:
+        ceph_cmd.append('-m')
+        ceph_cmd.append(args.monaddress)
+    if args.conf:
+        ceph_cmd.append('-c')
+        ceph_cmd.append(args.conf)
+    if args.id:
+        ceph_cmd.append('--id')
+        ceph_cmd.append(args.id)
+    if args.keyring:
+        ceph_cmd.append('--keyring')
+        ceph_cmd.append(args.keyring)
+    ceph_cmd.extend(CEPH_COMMAND.split(' '))
+
+    # exec command
+    p = subprocess.Popen(ceph_cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    output, err = p.communicate()
+
+    if p.returncode != 0 or not output:
+        print "MDS ERROR: %s" % err
+        return STATUS_ERROR
+  
+    # load json output and parse
+    mds_stat = None
+    try:
+        mds_stat = json.loads(output)
+    except Exception as e:
+        print "MDS ERROR: could not parse '%s' output: %s: %s" % (CEPH_COMMAND,output,e)
+        return STATUS_UNKNOWN
+
+    return check_target_mds(mds_stat, args.filesystem, args.name)
+
+def check_target_mds(mds_stat, fs_name, name):
+    # find mds from standby list
+    standby_mdss = _get_standby_mds(mds_stat)
+    for mds in standby_mdss:
+        if mds.get_name() == name:
+            print "MDS OK: %s" % (mds)
+            return STATUS_OK
+        
+    # find mds from active list
+    active_mdss = _get_active_mds(mds_stat, fs_name)
+    for mds in active_mdss:
+        if mds.get_name() != name:
+            continue
+        # target mds in active list
+        print "MDS %s: %s" % ("WARN" if mds.is_laggy() else "OK", mds)
+        return STATUS_WARNING if mds.is_laggy() else STATUS_OK
+
+    # not found
+    print "MDS ERROR: MDS '%s' is not found (offline?)" % (name)
+    return STATUS_ERROR
+
+def _get_standby_mds(mds_stat):
+    mds_array = []
+    for mds in mds_stat['fsmap']['standbys']:
+        name = mds['name'].encode('utf8')
+        state = mds['state'].encode('utf8')
+        laggy_since = mds['laggy_since'] if 'laggy_since' in mds else None
+        mds_array.append(MDS(name, state))
+
+    return mds_array
+
+def _get_active_mds(mds_stat, fs_name):
+    mds_fs = mds_stat['fsmap']['filesystems']
+
+    # find filesystem in stat
+    for i in xrange(len(mds_fs)):
+        mdsmap = mds_fs[i]['mdsmap']
+        if mdsmap['fs_name'] != fs_name:
+            continue
+        # put mds to array
+        mds_array = []
+        infos = mds_stat['fsmap']['filesystems'][i]['mdsmap']['info']
+        for gid in infos:
+            name = infos[gid]['name'].encode('utf8')
+            state = infos[gid]['state'].encode('utf8')
+            laggy_since = infos[gid]['laggy_since'] if 'laggy_since' in infos[gid] else None
+            mds_array.append(MDS(name, state, laggy_since))
+
+        return mds_array
+
+    # no fs found
+    return None
+
+class MDS(object):
+    def __init__(self, name, state, laggy_since=None):
+        self.name = name
+        self.state = state
+        self.laggy_since = laggy_since
+
+    def get_name(self):
+        return self.name
+
+    def get_state(self):
+        return self.state
+
+    def is_laggy(self):
+        return self.laggy_since is not None
+
+    def __str__(self):
+        msg = "MDS '%s' is %s" % (self.name, self.state)
+        if self.laggy_since is not None:
+            msg += " (laggy or crashed)"
+        return msg
+
+# main
+if __name__ == "__main__":
+  sys.exit(main())
+

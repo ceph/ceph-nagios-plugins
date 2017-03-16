@@ -207,5 +207,43 @@ Possible result includes OK, WARN and CRITICAL.
 		 cephfs_metadata     2      40380k         0          348G        8037
 		 libvirt-pool        3         145         0          348G           2
 
+## check_ceph_mds
+
+The `check_ceph_mds` nagios plugin monitors an individual mds daemon, reporting its status.
+
+Possible result includes OK, WARN (laggy) and Error (not found).
+
+### Usage
+	usage: check_ceph_mds [-h] [-e EXE] [-c CONF] [-m MONADDRESS] [-i ID]
+	                      [-k KEYRING] [-V] -n NAME -f FILESYSTEM
+
+	'ceph mds stat' nagios plugin.
+
+	optional arguments:
+	  -h, --help            show this help message and exit
+	  -e EXE, --exe EXE     ceph executable [/usr/bin/ceph]
+	  -c CONF, --conf CONF  alternative ceph conf file
+	  -m MONADDRESS, --monaddress MONADDRESS
+	                        ceph monitor to use for queries (address[:port])
+	  -i ID, --id ID        ceph client id
+	  -k KEYRING, --keyring KEYRING
+	                        ceph client keyring file
+	  -V, --version         show version and exit
+	  -n NAME, --name NAME  mds daemon name
+	  -f FILESYSTEM, --filesystem FILESYSTEM
+	                        mds filesystem name
+### Example
+	nagios$ ./check_ceph_mds -f cephfs -n ceph-mds-1
+	MDS OK: MDS 'ceph-mds-1' is up:active
+
+	nagios$ ./check_ceph_mds -f cephfs -n ceph-mds-2
+	MDS OK: MDS 'ceph-mds-2' is up:standby
+
+	nagios$ ./check_ceph_mds -f cephfs -n ceph-mds-1
+	MDS WARN: MDS 'ceph-mds-1' is up:active (laggy or crashed)
+
+	nagios$ ./check_ceph_mds -f cephfs -n ceph-mds-3
+	MDS ERROR: MDS 'ceph-mds-3' is not found (offline?)
+
 [ceph]: http://www.ceph.com
 [cephx]: http://ceph.com/docs/master/rados/operations/authentication/
