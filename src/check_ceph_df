@@ -147,7 +147,7 @@ def main():
                         poolout = '\n '.join(poolline)
                 else:
                         poolout = ''
-                print 'CRITICAL: global RAW usage of %s%% is above %s%% (%s of %s free)%s' % (global_usage_percent, args.critical, global_available_space, global_total_space, poolout)
+                print 'CRITICAL: global RAW usage of %s%% is above %s%% (%s of %s free)%s | Usage=%s%%;%s;%s;;' % (global_usage_percent, args.critical, global_available_space, global_total_space, poolout, global_usage_percent, args.warn, args.critical)
                 return STATUS_ERROR
             elif global_usage_percent > args.warn:
                 if args.detail:
@@ -155,10 +155,10 @@ def main():
                         poolout = '\n '.join(poolline)
                 else:
                         poolout = ''
-                print 'WARNING: global RAW usage of %s%% is above %s%% (%s of %s free)%s' % (global_usage_percent, args.warn, global_available_space, global_total_space, poolout)
+                print 'WARNING: global RAW usage of %s%% is above %s%% (%s of %s free)%s | Usage=%s%%;%s;%s;;' % (global_usage_percent, args.warn, global_available_space, global_total_space, poolout, global_usage_percent, args.warn, args.critical)
                 return STATUS_WARNING
             else:
-                print 'RAW usage %s%%' % global_usage_percent
+                print 'RAW usage %s%% | Usage=%s%%;%s;%s;;' % (global_usage_percent, global_usage_percent, args.warn, args.critical)
                 return STATUS_OK
 
         #for 
