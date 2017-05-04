@@ -1,0 +1,111 @@
+#!/usr/bin/env python
+#
+#  Copyright (c) 2016 SUSE Linux GmbH
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+# a very simple script to check bucket stats
+# invoke it like
+# ./check_rgw_http --host=http://localhost:8000 --access=access-key --secret=secret
+
+from __future__ import print_function
+import argparse
+import os
+import re
+import subprocess
+import sys
+import json
+
+
+import requests
+from awsauth import S3Auth
+from collections import namedtuple
+import six.moves.urllib.parse as urlparse
+
+__version__ = '1.0.0'
+
+# nagios exit code
+STATUS_OK = 0
+STATUS_WARNING = 1
+STATUS_ERROR = 2
+STATUS_UNKNOWN = 3
+
+class RGWAdminClient(object):
+    def __init__(self, host, access_key, secret_key):
+        self.access_key = access_key
+        self.secret = secret_key
+        self.endpoint = "{0}/{1}".format(host,"admin")
+        self.hostname = urlparse.urlparse(host).netloc
+
+    def get_method(self, method, params):
+        uri = "{0}/{1}".format(self.endpoint, method)
+        r = requests.get(uri, params=params,
+                         auth=S3Auth(self.access_key, self.secret, self.hostname))
+        if r.status_code != 200:
+          exit(STATUS_ERROR)
+
+        return r.json()
+
+    def get_bucket(self, tenant_id=None):
+        params={"stats":"True"}
+        if tenant_id is not None:
+          params["uid"] = tenant_id
+        stats_json = self.get_method("bucket", params)
+        return self._process_bucket_stats(stats_json, tenant_id)
+
+    def get_usage(self, tenant_id):
+        params={"uid": tenant_id}
+        usage_json = self.get_method("usage", params)
+        return self._process_usage_stats(usage_json)
+
+    @staticmethod
+    def _process_bucket_stats(json_data, tenant_id):
+        stats = {'num_buckets': 0, 'buckets': [], 'size': 0, 'num_objects': 0}
+        Bucket = namedtuple('Bucket', 'name, num_objects, size')
+        stats['num_buckets'] = len(json_data)
+        for it in json_data:
+            for k, v in it["usage"].items():
+                stats['num_objects'] += v["num_objects"]
+                stats['size'] += v["size_kb"]
+                stats['buckets'].append(Bucket(it["bucket"], v["num_objects"],
+                                               v["size_kb"]))
+
+        return stats
+
+    @staticmethod
+    def _process_usage_stats(json_data):
+        usage_data = json_data["summary"]
+        return sum((it["total"]["successful_ops"] for it in usage_data))
+
+def main():
+
+  # parse args
+  parser = argparse.ArgumentParser(description="'radosgw-admin bucket stats' nagios plugin.")
+  parser.add_argument('--access', help='rgw admin access key')
+  parser.add_argument('--secret', help='rgw secret access key')
+  parser.add_argument('-H','--host', help='rgw host')
+  parser.add_argument('-P','--port', help='rgw_port')
+  parser.add_argument('-d','--detail', help='output perf data for all buckets', action='store_true')
+  parser.add_argument('-B','--byte', help='output perf data in Byte instead of KB', action='store_true')
+  parser.add_argument('-c','--conf', help='alternative ceph conf file')
+  parser.add_argument('-i','--id', help='ceph client id')
+  parser.add_argument('-V','--version', help='show version and exit', action='store_true')
+  args = parser.parse_args()
+
+  rgw_admin = RGWAdminClient(args.host,args.access,args.secret)
+  stats = rgw_admin.get_bucket()
+  print(stats)
+
+
+if __name__ == "__main__":
+  sys.exit(main())
