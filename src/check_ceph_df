@@ -143,16 +143,16 @@ def main():
             # print 'DEBUG CRITICALLEVEL:', args.critical
             if global_usage_percent > args.critical:
                 if args.detail:
-                        poolline.insert(0, '\n')
-                        poolout = '\n '.join(poolline)
+                        poollines.insert(0, '\n')
+                        poolout = '\n '.join(poollines)
                 else:
                         poolout = ''
                 print 'CRITICAL: global RAW usage of %s%% is above %s%% (%s of %s free)%s | Usage=%s%%;%s;%s;;' % (global_usage_percent, args.critical, global_available_space, global_total_space, poolout, global_usage_percent, args.warn, args.critical)
                 return STATUS_ERROR
             elif global_usage_percent > args.warn:
                 if args.detail:
-                        poolline.insert(0, '\n')
-                        poolout = '\n '.join(poolline)
+                        poollines.insert(0, '\n')
+                        poolout = '\n '.join(poollines)
                 else:
                         poolout = ''
                 print 'WARNING: global RAW usage of %s%% is above %s%% (%s of %s free)%s | Usage=%s%%;%s;%s;;' % (global_usage_percent, args.warn, global_available_space, global_total_space, poolout, global_usage_percent, args.warn, args.critical)
