@@ -31,7 +31,7 @@ The `check_ceph_health` nagios plugin monitors the ceph cluster, and report its 
       -m MONADDRESS, --monaddress MONADDRESS
                             ceph monitor address[:port]
       -i ID, --id ID        ceph client id
-      -n ID, --name NAME    ceph client name
+      -n NAME, --name NAME  ceph client name
       -k KEYRING, --keyring KEYRING
                             ceph client keyring file
       -w, --whitelist REGEXP
@@ -144,6 +144,7 @@ Possible result includes OK (up), WARN (down or missing).
       -e EXE, --exe EXE     radosgw-admin executable [/usr/bin/radosgw-admin]
       -c CONF, --conf CONF  alternative ceph conf file
       -i ID, --id ID        ceph client id
+      -n NAME, --name NAME  ceph client name      
       -V, --version         show version and exit
 
 ### Example
