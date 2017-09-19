@@ -4,10 +4,10 @@ Uploaders: Sebastian Nickel <sebastian.nickel@nine.ch>, Roman Plessl <roman.ples
 Section: misc
 Priority: optional
 Standards-Version: 3.9.5
-Build-Depends: debhelper (>= 8), python
+Build-Depends: debhelper (>= 8), python-all
 
 Package: nagios-plugins-ceph
 Architecture: all
-Depends: ${python:Depends}, ${misc:Depends}
+Depends: python-all
 Description: Nagios plugins for Ceph
  This package provides a set of plugins to monitor a ceph cluster.
