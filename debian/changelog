@@ -1,3 +1,13 @@
+nagios-plugins-ceph (1.5.2) unstable; urgency=medium
+
+  * Changed the version number to fix "dpkg-source: error:
+    can't build with source format '3.0 (native)': native package version may
+    not have a revision"
+  * Changed "python-support" dependency to "python", since the former is
+    absent from stretch.
+
+ -- Ash <ash.github@comtek.co.uk> Tue, 19 Sep 2017 21:09:00 +0000
+
 nagios-plugins-ceph (1.5.1-1) unstable; urgency=medium
 
   * Added whitelist regexp filter for good/unhandled ceph health warnings

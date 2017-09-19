@@ -4,7 +4,7 @@ Uploaders: Sebastian Nickel <sebastian.nickel@nine.ch>, Roman Plessl <roman.ples
 Section: misc
 Priority: optional
 Standards-Version: 3.9.5
-Build-Depends: debhelper (>= 8), python-support
+Build-Depends: debhelper (>= 8), python
 
 Package: nagios-plugins-ceph
 Architecture: all
