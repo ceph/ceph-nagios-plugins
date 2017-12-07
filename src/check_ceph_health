@@ -108,7 +108,7 @@ def main():
     #print "err:", err
     if output:
         ret = STATUS_OK
-        msg = ""
+        msg = "HEALTH OK"
         extended = ""
         if output.has_key('checks'):
             #luminous
@@ -145,7 +145,7 @@ def main():
                   else:
                      extended += status['summary']+'\n'
         print msg
-        print extended
+        if extended: print extended
         return ret
 
 
