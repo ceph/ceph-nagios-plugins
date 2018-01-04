@@ -113,27 +113,26 @@ def main():
         if output.has_key('checks'):
             #luminous
             for check,status in output['checks'].iteritems():
-                if status["severity"] == "HEALTH_ERROR":
-                    extended += msg
-                    msg = "CRITCAL: %s(%s)" % (check,status['summary']['message'])
-                    ret = STATUS_CRITICAL
+                if status["severity"] == "HEALTH_ERR":
+                    msg = "CRITCAL: %s( %s )" % (check,status['summary']['message'])
+                    ret = STATUS_ERROR
                     continue
 
                 if args.whitelist and re.search(args.whitelist,status['summary']['message']):
                     continue
 
                 if not msg:
-                    msg = "WARNING: %s(%s)" % (check,status['summary']['message'])
+                    msg = "WARNING: %s( %s )" % (check,status['summary']['message'])
                     ret = STATUS_WARNING
                 else:
-                     extended += status['summary']['message']+'\n'
+                     extended += "%s( %s )" % (check,status['summary']['message'])+'\n'
         else:
             #pre-luminous
             for status in output["summary"]:
                 if status != "HEALTH_OK":
                   if status == "HEALTH_ERROR":
                       msg = "CRITCAL: %s" % status['summary']
-                      ret = STATUS_CRITICAL
+                      ret = STATUS_ERROR
                       continue
 
                   if args.whitelist and re.search(args.whitelist,status['summary']):
