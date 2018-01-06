@@ -108,12 +108,13 @@ def main():
     #print "err:", err
     if output:
         ret = STATUS_OK
-        msg = "HEALTH OK"
+        msg = ""
         extended = ""
         if output.has_key('checks'):
             #luminous
             for check,status in output['checks'].iteritems():
                 if status["severity"] == "HEALTH_ERR":
+                    extended += msg
                     msg = "CRITCAL: %s( %s )" % (check,status['summary']['message'])
                     ret = STATUS_ERROR
                     continue
@@ -143,7 +144,10 @@ def main():
                       ret = STATUS_WARNING
                   else:
                      extended += status['summary']+'\n'
-        print msg
+        if msg:
+            print msg
+        else:
+            print "HEALTH OK"
         if extended: print extended
         return ret
 
