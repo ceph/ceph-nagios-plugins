@@ -8,11 +8,11 @@ Ceph is normally configured to use [cephx] to authenticate its client.
 
 To run the `check_ceph_health` or other plugins as user `nagios` you have to create a special keyring:
 
-    root# ceph auth get-or-create client.nagios mon 'allow r' > client.nagios.keyring
+    root# ceph auth get-or-create client.nagios mon 'allow r' > ceph.client.nagios.keyring
 
 And use this keyring with the plugin:
 
-    nagios$ ./check_ceph_health --id nagios --keyring client.nagios.keyring
+    nagios$ ./check_ceph_health --id nagios --keyring ceph.client.nagios.keyring
 
 ## check_ceph_health
 
@@ -41,7 +41,7 @@ The `check_ceph_health` nagios plugin monitors the ceph cluster, and report its 
 
 ### Example
 
-    nagios$ ./check_ceph_health --name client.nagios --keyring client.nagios.keyring
+    nagios$ ./check_ceph_health --name client.nagios --keyring ceph.client.nagios.keyring
     HEALTH WARNING: 1 pgs degraded; 1 pgs recovering; 1 pgs stuck unclean; recovery 4448/28924462 degraded (0.015%); 2/9857830 unfound (0.000%);
     nagios$ echo $?
     1
@@ -186,19 +186,19 @@ Possible result includes OK, WARN and CRITICAL.
 
 ### Example
 
-    nagios$ ./check_ceph_df -i nagios -k /etc/ceph/client.nagios.keyring -W 29.12 -C 30.22 -d
+    nagios$ ./check_ceph_df -i nagios -k /etc/ceph/ceph.client.nagios.keyring -W 29.12 -C 30.22 -d
 	RAW usage 28.36%
 
-    nagios$ ./check_ceph_df -i nagios -k /etc/ceph/client.nagios.keyring -W 26.14 -C 30
+    nagios$ ./check_ceph_df -i nagios -k /etc/ceph/ceph.client.nagios.keyring -W 26.14 -C 30
     WARNING: global RAW usage of 28.36% is above 26.14% (783G of 1093G free)
 
-    nagios$ ./check_ceph_df -i nagios -k /etc/ceph/client.nagios.keyring -W 60 -C 70 -p hdd
+    nagios$ ./check_ceph_df -i nagios -k /etc/ceph/ceph.client.nagios.keyring -W 60 -C 70 -p hdd
     CRITICAL: Pool 'hdd' usage of 71.71% is above 70.0% (9703G used)
 
-    nagios$ ./check_ceph_df -i nagios -k /etc/ceph/client.nagios.keyring -W 60 -C 70 -p nvme
+    nagios$ ./check_ceph_df -i nagios -k /etc/ceph/ceph.client.nagios.keyring -W 60 -C 70 -p nvme
     CRITICAL: Pool 'nvme' usage of 76.08% is above 70.0% (223G used)
 
-    nagios$ ./check_ceph_df -i nagios -k /etc/ceph/client.nagios.keyring -W 26.14 -C 30 -d
+    nagios$ ./check_ceph_df -i nagios -k /etc/ceph/ceph.client.nagios.keyring -W 26.14 -C 30 -d
 	WARNING: global RAW usage of 28.36% is above 26.14% (783G of 1093G free)
 
 	 POOLS:
