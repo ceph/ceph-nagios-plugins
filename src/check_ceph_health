@@ -20,6 +20,7 @@ import os
 import subprocess
 import sys
 import re
+import json
 
 __version__ = '1.5.2'
 
@@ -90,38 +91,66 @@ def main():
     if args.detail:
         ceph_health.append('detail')
 
+    ceph_health.append('--format')
+    ceph_health.append('json')
     #print ceph_health
 
     # exec command
     p = subprocess.Popen(ceph_health,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
     output, err = p.communicate()
+    try:
+        output = json.loads(output)
+    except ValueError:
+        return STATUS_UNKNOWN
 
     # parse output
-    #print "output:", output
+    # print "output:", output
     #print "err:", err
     if output:
-        # merge multi-lines of output in one line
-        one_line = output.replace('\n','; ')
-        if one_line.startswith('HEALTH_OK'):
-            #print 'HEALTH OK:', one_line[len('HEALTH_OK')+1:]
-            one_line= one_line[len('HEALTH_OK')+1:].strip()
-            if one_line:
-                print 'HEALTH OK:', one_line
-            else:
-                print 'HEALTH OK'
-            return STATUS_OK
-        elif one_line.startswith('HEALTH_WARN'):
-            if args.whitelist and re.search(args.whitelist, one_line):
-                print 'HEALTH OK'
-                return STATUS_OK
+        ret = STATUS_OK
+        msg = ""
+        extended = ""
+        if output.has_key('checks'):
+            #luminous
+            for check,status in output['checks'].iteritems():
+                if status["severity"] == "HEALTH_ERR":
+                    extended += msg
+                    msg = "CRITCAL: %s( %s )" % (check,status['summary']['message'])
+                    ret = STATUS_ERROR
+                    continue
 
-            print 'HEALTH WARNING:', one_line[len('HEALTH_WARN')+1:]
-            return STATUS_WARNING
-        elif one_line.startswith('HEALTH_ERR'):
-            print 'HEALTH ERROR:', one_line[len('HEALTH_ERR')+1:]
-            return STATUS_ERROR
+                if args.whitelist and re.search(args.whitelist,status['summary']['message']):
+                    continue
+
+                if not msg:
+                    msg = "WARNING: %s( %s )" % (check,status['summary']['message'])
+                    ret = STATUS_WARNING
+                else:
+                     extended += "%s( %s )" % (check,status['summary']['message'])+'\n'
         else:
-            print one_line
+            #pre-luminous
+            for status in output["summary"]:
+                if status != "HEALTH_OK":
+                  if status == "HEALTH_ERROR":
+                      msg = "CRITCAL: %s" % status['summary']
+                      ret = STATUS_ERROR
+                      continue
+
+                  if args.whitelist and re.search(args.whitelist,status['summary']):
+                      continue
+
+                  if not msg:
+                      msg = "WARNING: %s" % status['summary']
+                      ret = STATUS_WARNING
+                  else:
+                     extended += status['summary']+'\n'
+        if msg:
+            print msg
+        else:
+            print "HEALTH OK"
+        if extended: print extended
+        return ret
+
 
     elif err:
         # read only first line of error
@@ -137,4 +166,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-
