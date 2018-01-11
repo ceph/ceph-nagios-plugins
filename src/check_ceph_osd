@@ -22,7 +22,7 @@ import subprocess
 import sys
 import socket
 
-__version__ = '1.5.0'
+__version__ = '1.5.1'
 
 # default ceph values
 CEPH_COMMAND = '/usr/bin/ceph'
@@ -75,8 +75,11 @@ def main():
     return STATUS_UNKNOWN
 
   try:
-    args.host = socket.gethostbyname(args.host)
-  except socket.gaierror:
+    addrinfo = socket.getaddrinfo(args.host, None, 0, socket.SOCK_STREAM)
+    args.host = addrinfo[0][-1][0]
+    if addrinfo[0][0] == socket.AF_INET6:
+      args.host = "[%s]" % args.host
+  except:
     print 'OSD ERROR: could not resolve %s' % args.host
     return STATUS_UNKNOWN
 
