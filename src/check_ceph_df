@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 #  Copyright (c) 2013 SWITCH http://www.switch.ch
 #
@@ -128,10 +129,10 @@ def main():
                         return STATUS_ERROR
                     if pool_usage_percent > args.warn:
                         print 'WARNING: Pool \'%s\' usage of %s%% is above %s%% (%s used)' % (args.pool, pool_usage_percent, args.warn, pool_used)
-                        return STATUS_WARNING    
-                    else: 
+                        return STATUS_WARNING
+                    else:
                         print 'Pool \'%s\' usage %s%%' % (args.pool, pool_usage_percent)
-                        return STATUS_OK  
+                        return STATUS_OK
         else:
             # print 'DEBUG:', globalvals
             # finally 4th element contains percentual value
@@ -161,7 +162,7 @@ def main():
                 print 'RAW usage %s%% | Usage=%s%%;%s;%s;;' % (global_usage_percent, global_usage_percent, args.warn, args.critical)
                 return STATUS_OK
 
-        #for 
+        #for
     elif err:
         # read only first line of error
         one_line = err.split('\n')[0]
@@ -176,4 +177,3 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
-

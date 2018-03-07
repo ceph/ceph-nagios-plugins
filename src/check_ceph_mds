@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 #  Copyright (c) 2013 Catalyst IT http://www.catalyst.net.nz
 #  Copyright (c) 2015 SWITCH http://www.switch.ch
@@ -90,7 +91,7 @@ def main():
     if p.returncode != 0 or not output:
         print "MDS ERROR: %s" % err
         return STATUS_ERROR
-  
+
     # load json output and parse
     mds_stat = None
     try:
@@ -108,7 +109,7 @@ def check_target_mds(mds_stat, fs_name, name):
         if mds.get_name() == name:
             print "MDS OK: %s" % (mds)
             return STATUS_OK
-        
+
     # find mds from active list
     active_mdss = _get_active_mds(mds_stat, fs_name)
     for mds in active_mdss:
@@ -178,4 +179,3 @@ class MDS(object):
 # main
 if __name__ == "__main__":
   sys.exit(main())
-
