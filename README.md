@@ -155,6 +155,74 @@ Possible result includes OK (up), WARN (down or missing).
     nagios$ ./check_ceph_rgw --detail --byte
     RGW OK: 4 buckets, 102276 KB total | /=104730624B bucket-test1=151552B bucket-test0=12288B bucket-test2=104566784B bucket-test=0B
 
+## check_ceph_rgw_api
+
+The `check_ceph_rgw_api` nagios plugin monitors a ceph rados gateway, reporting
+its status and buckets usage.
+
+##### Difference with `check_ceph_rgw`:
+
+`check_ceph_rgw` is designed for connect to cluster, `check_ceph_rgw_api` is
+connected to radosgw directly via
+[admin api](http://docs.ceph.com/docs/master/radosgw/adminops/). You can
+check each instance of radosgw or only one endpoint via proxy/balancer
+(or both).
+
+#### Possible results
+- OK - bucket info recieved from radosgw;
+- WARNING - connected, but wrong admin entry or usage caps;
+- UNKNOWN - can't connect to proxy/balancer or radosgw directly;
+
+#### Requirements
+
+1. Install [requests-aws](//github.com/tax/python-requests-aws) python library:
+```
+pip install requests-aws
+```
+
+2. Configure admin entry point (default is 'admin'):
+```
+rgw admin entry = "admin"
+```
+
+3. Enable admin API (default is enabled):
+```
+rgw enable apis = "s3, admin"
+```
+
+4. Add capability `buckets=read` for your user who performed checks, see
+[Admin Guide](http://docs.ceph.com/docs/master/radosgw/admin/#add-remove-admin-capabilities)
+for more details.
+
+### Usage
+    usage: check_ceph_rgw_api [-h] -H HOST [-e ADMIN_ENTRY] -a ACCESS_KEY -s
+                              SECRET_KEY [-d] [-B] [-v]
+
+    'radosgw api bucket stats' nagios plugin.
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -H HOST, --host HOST  Server URL for the radosgw api (example:
+                            http://objects.dreamhost.com/)
+      -e ADMIN_ENTRY, --admin_entry ADMIN_ENTRY
+                            The entry point for an admin request URL [default is
+                            'admin']
+      -a ACCESS_KEY, --access_key ACCESS_KEY
+                            S3 access key
+      -s SECRET_KEY, --secret_key SECRET_KEY
+                            S3 secret key
+      -d, --detail          output perf data for all buckets
+      -b, --byte            output perf data in Byte instead of KB
+      -v, --version         show version and exit
+
+### Example
+
+    nagios$ ./check_ceph_rgw_api -H https://objects.dreamhost.com/ -a JXUABTZZYHAFLCMF9VYV -s jjP8RDD0R156atS6ACSy2vNdJLdEPM0TJQ5jD1pw
+    RGW OK: 1 buckets, 7696 KB total | /=7696KB
+
+    nagios$ ./check_ceph_rgw_api -H objects.dreamhost.com -a JXUABTZZYHAFLCMF9VYV -s jjP8RDD0R156atS6ACSy2vNdJLdEPM0TJQ5jD1pw --detail --byte
+    RGW OK: 1 buckets, 7696 KB total | /=7880704B k0ste=7880704B
+
 ## check_ceph_df
 
 The `check_ceph_df` nagios plugin monitors a ceph cluster, reporting its percentual RAW capacity usage, or specific pool usage.

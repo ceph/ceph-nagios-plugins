@@ -1,0 +1,107 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+#  Copyright (c) 2014 Catalyst IT http://www.catalyst.net.nz
+#  Copyright (c) 2015 SWITCH http://www.switch.ch
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+
+import requests
+import json
+import argparse
+import sys
+from awsauth import S3Auth
+
+__version__ = '1.5.3'
+
+# nagios exit code
+STATUS_OK = 0
+STATUS_WARNING = 1
+STATUS_CRITICAL = 2
+STATUS_UNKNOWN = 3
+
+def main():
+
+  # parse args
+  parser = argparse.ArgumentParser(description="'radosgw api bucket stats' nagios plugin.")
+  parser.add_argument('-H', '--host', help="Server URL for the radosgw api (example: http://objects.dreamhost.com/)", required=True)
+  parser.add_argument('-e', '--admin_entry', help="The entry point for an admin request URL [default is '%(default)s']", default="admin")
+  parser.add_argument('-a', '--access_key', help="S3 access key", required=True)
+  parser.add_argument('-s', '--secret_key', help="S3 secret key", required=True)
+  parser.add_argument('-d', '--detail', help="output perf data for all buckets", action="store_true")
+  parser.add_argument('-b', '--byte', help="output perf data in Byte instead of KB", action="store_true")
+  parser.add_argument('-v', '--version', help='show version and exit', action="store_true")
+  args = parser.parse_args()
+
+  if args.version:
+      print("version {0}".format(__version__))
+      return STATUS_OK
+
+  # helpers for default schema
+  if not args.host.startswith("http"):
+      args.host = "http://{0}".format(args.host)
+  # and for request_uri
+  if not args.host.endswith("/"):
+      args.host = "{0}/".format(args.host)
+
+  url = "{0}{1}/bucket?format=json&stats=True".format(args.host,
+                                                      args.admin_entry)
+
+  try:
+      response = requests.get(url, auth=S3Auth(args.access_key, args.secret_key,
+                                               args.host))
+
+      if response.status_code == requests.codes.ok:
+          bucket_stats = response.json()
+      else:
+          # no usage caps or wrong admin entry
+          print("RGW ERROR [{0}]: {1}".format(response.status_code,
+                                              response.content.decode('utf-8')))
+          return STATUS_WARNING
+
+# DNS, connection errors, etc
+  except requests.exceptions.RequestException as e:
+      print("RGW ERROR: {0}".format(e))
+      return STATUS_UNKNOWN
+
+  #print(bucket_stats)
+  buckets = []
+  for i in bucket_stats:
+    if type(i) is dict:
+      bucket_name = i['bucket']
+      usage_dict = i['usage']
+      if not usage_dict:
+        bucket_usage_kb = 0
+      else:
+        bucket_usage_kb = usage_dict['rgw.main']['size_kb_actual']
+      buckets.append((bucket_name, bucket_usage_kb))
+  buckets_total_kb = sum([b[1] for b in buckets])
+
+  status = "RGW OK: {0} buckets, {1} KB total | /={2}{3} "
+
+  if args.byte:
+    status = status.format(len(buckets), buckets_total_kb, buckets_total_kb*1024, "B")
+  else:
+    status = status.format(len(buckets), buckets_total_kb, buckets_total_kb, "KB")
+  #print(buckets)
+  if buckets and args.detail:
+    if args.byte:
+      status = status + " ".join(["{}={}B".format(b[0], b[1]*1024) for b in buckets])
+    else:
+      status = status + " ".join(["{}={}KB".format(b[0], b[1]) for b in buckets])
+
+  print(status)
+  return STATUS_OK
+
+if __name__ == "__main__":
+  sys.exit(main())

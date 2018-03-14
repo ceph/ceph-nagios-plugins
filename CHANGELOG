@@ -1,27 +1,29 @@
 Nagios plugins for Ceph
 -----------------------
+Version 1.5.3:
+* `check_ceph_rgw_api` plugin added.
+
 Version 1.5.0:
-* check_ceph_df plugin added.
+* `check_ceph_df` plugin added.
 
 Version 1.4.0:
-* Refactored check_ceph_mon plugin (v1.1.0), parses ceph quorum_status output.
+* Refactored `check_ceph_mon plugin` (v1.1.0), parses ceph quorum_status output.
 
 Version 1.3.1:
-* check_ceph_rgw with detailed bucket stats as perf data (--detail).
+* `check_ceph_rgw` with detailed bucket stats as perf data (--detail).
 
 Version 1.3.0:
-* check_ceph_rgw with bucket stats as perf data.
+* `check_ceph_rgw` with bucket stats as perf data.
 
 Version 1.2.0:
-* check_ceph_rgw plugin added.
+* `check_ceph_rgw` plugin added.
 
 Version 1.1.0:
-* check_ceph_mon plugin added.
-* check_ceph_osd plugin added.
+* `check_ceph_mon` plugin added.
+* `check_ceph_osd` plugin added.
 
 Version 1.0.1:
 * HEALTH_OK doesn't always have additional information.
 
 Version 1.0:
 * Initial 'ceph health' nagios plugin.
-
