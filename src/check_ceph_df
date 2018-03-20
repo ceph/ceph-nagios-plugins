@@ -125,13 +125,13 @@ def main():
                     pool_objects = float(poolvals[5])
 
                     if pool_usage_percent > args.critical:
-                        print 'CRITICAL: Pool \'%s\' usage of %s%% is above %s%% (%s used)' % (args.pool, pool_usage_percent, args.critical, pool_used)
+                        print 'CRITICAL: %s%% usage in Pool \'%s\' is above %s%% (%s used) | Usage=%s%%;%s;%s;;' % (pool_usage_percent, args.pool, args.critical, pool_used, pool_usage_percent, args.warn, args.critical)
                         return STATUS_ERROR
                     if pool_usage_percent > args.warn:
-                        print 'WARNING: Pool \'%s\' usage of %s%% is above %s%% (%s used)' % (args.pool, pool_usage_percent, args.warn, pool_used)
+                        print 'WARNING: %s%% usage in Pool \'%s\' is above %s%% (%s used) | Usage=%s%%;%s;%s;;' % (pool_usage_percent, args.pool, args.warn, pool_used, pool_usage_percent, args.warn, args.critical)
                         return STATUS_WARNING
                     else:
-                        print 'Pool \'%s\' usage %s%%' % (args.pool, pool_usage_percent)
+                        print '%s%% usage in Pool \'%s\' | Usage=%s%%;%s;%s;;' % (pool_usage_percent, args.pool, pool_usage_percent, args.warn, args.critical)
                         return STATUS_OK
         else:
             # print 'DEBUG:', globalvals
