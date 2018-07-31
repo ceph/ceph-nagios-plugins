@@ -195,8 +195,8 @@ rgw enable apis = "s3, admin"
 for more details.
 
 ### Usage
-    usage: check_ceph_rgw_api [-h] -H HOST [-e ADMIN_ENTRY] -a ACCESS_KEY -s
-                              SECRET_KEY [-d] [-B] [-v]
+    usage: check_ceph_rgw_api [-h] -H HOST [-k] [-e ADMIN_ENTRY] -a ACCESS_KEY -s
+                          SECRET_KEY [-d] [-b] [-v]
 
     'radosgw api bucket stats' nagios plugin.
 
@@ -204,6 +204,7 @@ for more details.
       -h, --help            show this help message and exit
       -H HOST, --host HOST  Server URL for the radosgw api (example:
                             http://objects.dreamhost.com/)
+      -k, --insecure        Allow insecure server connections when using SSL
       -e ADMIN_ENTRY, --admin_entry ADMIN_ENTRY
                             The entry point for an admin request URL [default is
                             'admin']
