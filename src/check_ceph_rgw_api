@@ -22,7 +22,7 @@ import argparse
 import sys
 from awsauth import S3Auth
 
-__version__ = '1.5.3'
+__version__ = '1.5.4'
 
 # nagios exit code
 STATUS_OK = 0
@@ -35,6 +35,7 @@ def main():
   # parse args
   parser = argparse.ArgumentParser(description="'radosgw api bucket stats' nagios plugin.")
   parser.add_argument('-H', '--host', help="Server URL for the radosgw api (example: http://objects.dreamhost.com/)", required=True)
+  parser.add_argument('-k', '--insecure', help="Allow insecure server connections when using SSL", action="store_false")
   parser.add_argument('-e', '--admin_entry', help="The entry point for an admin request URL [default is '%(default)s']", default="admin")
   parser.add_argument('-a', '--access_key', help="S3 access key", required=True)
   parser.add_argument('-s', '--secret_key', help="S3 secret key", required=True)
@@ -58,8 +59,14 @@ def main():
                                                       args.admin_entry)
 
   try:
-      response = requests.get(url, auth=S3Auth(args.access_key, args.secret_key,
-                                               args.host))
+      # Inversion of condition, when '--insecure' is defined we disable
+      # requests warning about certificate hostname mismatch.
+      if not args.insecure:
+          requests.packages.urllib3.disable_warnings()
+
+      response = requests.get(url, verify=args.insecure,
+                              auth=S3Auth(args.access_key, args.secret_key,
+                                          args.host))
 
       if response.status_code == requests.codes.ok:
           bucket_stats = response.json()
