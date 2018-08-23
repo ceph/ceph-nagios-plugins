@@ -1,0 +1,185 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+#  Copyright (c) 2018 SWITCH http://www.switch.ch
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+
+import argparse
+import os
+import subprocess
+import sys
+import json
+
+__version__ = '1.0.0'
+
+# default ceph values
+CEPH_EXEC = '/usr/bin/ceph'
+CEPH_COMMAND = 'mgr dump -f json'
+
+CEPH_MGR_DUMP_EXAMPLE = '''
+$ ceph --version
+ceph version 12.2.7 (3ec878d1e53e1aeb47a9f619c49d9e7c0aa384d5) luminous (stable)
+$ ceph mgr dump -f json|jq .
+{
+  "epoch": 165,
+  "active_gid": 248001409,
+  "active_name": "zhdk0013",
+  "active_addr": "10.10.10.9:6800/810408",
+  "available": true,
+  "standbys": [
+    {
+      "gid": 247991934,
+      "name": "zhdk0009",
+      "available_modules": [
+        "balancer",
+        "dashboard",
+        "influx",
+        "localpool",
+        "prometheus",
+        "restful",
+        "selftest",
+        "status",
+        "zabbix"
+      ]
+    },
+    {
+      "gid": 248011196,
+      "name": "zhdk0025",
+      "available_modules": [
+        "balancer",
+        "dashboard",
+        "influx",
+        "localpool",
+        "prometheus",
+        "restful",
+        "selftest",
+        "status",
+        "zabbix"
+      ]
+    }
+  ],
+  "modules": [
+    "balancer",
+    "restful",
+    "status"
+  ],
+  "available_modules": [
+    "balancer",
+    "dashboard",
+    "influx",
+    "localpool",
+    "prometheus",
+    "restful",
+    "selftest",
+    "status",
+    "zabbix"
+  ],
+  "services": {}
+}
+'''
+
+# nagios exit code
+STATUS_OK = 0
+STATUS_WARNING = 1
+STATUS_ERROR = 2
+STATUS_UNKNOWN = 3
+
+def main():
+    # parse args
+    parser = argparse.ArgumentParser(description="'ceph mgr dump' nagios plugin.")
+    parser.add_argument('-e','--exe', help='ceph executable [%s]' % CEPH_EXEC)
+    parser.add_argument('-c','--conf', help='alternative ceph conf file')
+    parser.add_argument('-m','--monaddress', help='ceph monitor to use for queries (address[:port])')
+    parser.add_argument('-i','--id', help='ceph client id')
+    parser.add_argument('-n','--name', help='ceph client name')
+    parser.add_argument('-k','--keyring', help='ceph client keyring file')
+    parser.add_argument('-V','--version', help='show version and exit', action='store_true')
+    args = parser.parse_args()
+
+    if args.version:
+        print("version {}".format(__version__))
+        return STATUS_OK
+
+    # validate args
+    ceph_exec = args.exe if args.exe else CEPH_EXEC
+    if not os.path.exists(ceph_exec):
+        print("MGR ERROR: ceph executable '{}' doesn't exist".format(ceph_exec))
+        return STATUS_UNKNOWN
+
+    if args.conf and not os.path.exists(args.conf):
+        print("MGR ERROR: ceph conf file '{}' doesn't exist".format(args.conf))
+        return STATUS_UNKNOWN
+
+    if args.keyring and not os.path.exists(args.keyring):
+        print("MGR ERROR: keyring file '{}' doesn't exist".format(args.keyring))
+        return STATUS_UNKNOWN
+
+    # build command
+    ceph_cmd = [ceph_exec]
+    if args.monaddress:
+        ceph_cmd.append('-m')
+        ceph_cmd.append(args.monaddress)
+    if args.conf:
+        ceph_cmd.append('-c')
+        ceph_cmd.append(args.conf)
+    if args.id:
+        ceph_cmd.append('--id')
+        ceph_cmd.append(args.id)
+    if args.name:
+        ceph_cmd.append('--name')
+        ceph_cmd.append(args.name)
+    if args.keyring:
+        ceph_cmd.append('--keyring')
+        ceph_cmd.append(args.keyring)
+    ceph_cmd.extend(CEPH_COMMAND.split(' '))
+
+    # exec command
+    p = subprocess.Popen(ceph_cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    output, err = p.communicate()
+
+    if p.returncode != 0 or not output:
+        print("MGR ERROR: {}".format(err))
+        return STATUS_UNKNOWN
+
+    # load json output and parse
+    mgr_dump = None
+    try:
+        mgr_dump = json.loads(output)
+    except Exception as e:
+        print("MGR ERROR: could not parse '{}' output: {}: {}".format(ceph_cmd, output, e))
+        return STATUS_UNKNOWN
+
+    # check active
+    if not 'active_name' in mgr_dump:
+        print("MGR: not active mgr")
+        return STATUS_ERROR
+
+    active_mgr_name = mgr_dump['active_name']
+    # check standby
+    standby_mgr_names = []
+    for standby_mgr in mgr_dump['standbys']:
+        standby_mgr_names.append(standby_mgr['name'])
+
+    if len(standby_mgr_names) <= 0:
+        print("MGR: active: {} but no standbys".format(active_mgr_name))
+        return STATUS_WARNING
+    else:
+        print("MGR: active: {}, standbys: {}".format(active_mgr_name, 
+                                                        ", ".join(standby_mgr_names)))
+        return STATUS_OK
+
+# main
+if __name__ == "__main__":
+  sys.exit(main())
