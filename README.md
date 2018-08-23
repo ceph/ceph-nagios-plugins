@@ -49,7 +49,6 @@ The `check_ceph_health` nagios plugin monitors the ceph cluster, and report its 
 
     nagios$ ./check_ceph_health --id nagios --whitelist 'requests.are.blocked(\s)*32.sec'
 
-
 ## check_ceph_mon
 
 The `check_ceph_mon` nagios plugin monitors an individual mon daemon, reporting its status.
@@ -133,6 +132,7 @@ The `check_ceph_rgw` nagios plugin monitors a ceph rados gateway, reporting its 
 Possible result includes OK (up), WARN (down or missing).
 
 ### Usage
+
     usage: check_ceph_rgw [-h] [-d] [-B] [-e EXE] [-c CONF] [-i ID] [-V]
 
     'radosgw-admin bucket stats' nagios plugin.
@@ -195,6 +195,7 @@ rgw enable apis = "s3, admin"
 for more details.
 
 ### Usage
+
     usage: check_ceph_rgw_api [-h] -H HOST [-k] [-e ADMIN_ENTRY] -a ACCESS_KEY -s
                           SECRET_KEY [-d] [-b] [-v]
 
@@ -231,32 +232,33 @@ The `check_ceph_df` nagios plugin monitors a ceph cluster, reporting its percent
 Possible result includes OK, WARN and CRITICAL.
 
 ### Usage
-	usage: check_ceph_df [-h] [-e EXE] [-c CONF] [-m MONADDRESS] [-i ID] [-n NAME]
-						 [-k KEYRING] [-d] [-W WARN] [-C CRITICAL] [-V]
 
-	'ceph df' nagios plugin.
+    usage: check_ceph_df [-h] [-e EXE] [-c CONF] [-m MONADDRESS] [-i ID] [-n NAME]
+                         [-k KEYRING] [-d] [-W WARN] [-C CRITICAL] [-V]
 
-	optional arguments:
-	  -h, --help            show this help message and exit
-	  -e EXE, --exe EXE     ceph executable [/usr/bin/ceph]
-	  -c CONF, --conf CONF  alternative ceph conf file
-	  -m MONADDRESS, --monaddress MONADDRESS
-							ceph monitor address[:port]
-	  -i ID, --id ID        ceph client id
-	  -n NAME, --name NAME  ceph client name
-	  -k KEYRING, --keyring KEYRING
-							ceph client keyring file
-	  -p POOL, --pool POOL  ceph pool name
-	  -d, --detail          show pool details on warn and critical
-	  -W WARN, --warn WARN  warn above this percent RAW USED
-	  -C CRITICAL, --critical CRITICAL
-							critical alert above this percent RAW USED
-	  -V, --version         show version and exit
+    'ceph df' nagios plugin.
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -e EXE, --exe EXE     ceph executable [/usr/bin/ceph]
+      -c CONF, --conf CONF  alternative ceph conf file
+      -m MONADDRESS, --monaddress MONADDRESS
+                            ceph monitor address[:port]
+      -i ID, --id ID        ceph client id
+      -n NAME, --name NAME  ceph client name
+      -k KEYRING, --keyring KEYRING
+                            ceph client keyring file
+      -p POOL, --pool POOL  ceph pool name
+      -d, --detail          show pool details on warn and critical
+      -W WARN, --warn WARN  warn above this percent RAW USED
+      -C CRITICAL, --critical CRITICAL
+                            critical alert above this percent RAW USED
+      -V, --version         show version and exit
 
 ### Example
 
     nagios$ ./check_ceph_df -i nagios -k /etc/ceph/ceph.client.nagios.keyring -W 29.12 -C 30.22 -d
-	RAW usage 28.36%
+    RAW usage 28.36%
 
     nagios$ ./check_ceph_df -i nagios -k /etc/ceph/ceph.client.nagios.keyring -W 26.14 -C 30
     WARNING: global RAW usage of 28.36% is above 26.14% (783G of 1093G free)
@@ -268,14 +270,14 @@ Possible result includes OK, WARN and CRITICAL.
     CRITICAL: Pool 'nvme' usage of 76.08% is above 70.0% (223G used)
 
     nagios$ ./check_ceph_df -i nagios -k /etc/ceph/ceph.client.nagios.keyring -W 26.14 -C 30 -d
-	WARNING: global RAW usage of 28.36% is above 26.14% (783G of 1093G free)
+    WARNING: global RAW usage of 28.36% is above 26.14% (783G of 1093G free)
 
-	 POOLS:
-		 NAME                ID     USED       %USED     MAX AVAIL     OBJECTS
-		 rbd                 0      96137M      8.59          348G       24441
-		 cephfs_data         1      61785M      5.52          348G       99940
-		 cephfs_metadata     2      40380k         0          348G        8037
-		 libvirt-pool        3         145         0          348G           2
+     POOLS:
+         NAME                ID     USED       %USED     MAX AVAIL     OBJECTS
+         rbd                 0      96137M      8.59          348G       24441
+         cephfs_data         1      61785M      5.52          348G       99940
+         cephfs_metadata     2      40380k         0          348G        8037
+         libvirt-pool        3         145         0          348G           2
 
 ## check_ceph_mds
 
@@ -284,36 +286,67 @@ The `check_ceph_mds` nagios plugin monitors an individual mds daemon, reporting 
 Possible result includes OK, WARN (laggy) and Error (not found).
 
 ### Usage
-	usage: check_ceph_mds [-h] [-e EXE] [-c CONF] [-m MONADDRESS] [-i ID]
-	                      [-k KEYRING] [-V] -n NAME -f FILESYSTEM
 
-	'ceph mds stat' nagios plugin.
+    usage: check_ceph_mds [-h] [-e EXE] [-c CONF] [-m MONADDRESS] [-i ID]
+                          [-k KEYRING] [-V] -n NAME -f FILESYSTEM
 
-	optional arguments:
-	  -h, --help            show this help message and exit
-	  -e EXE, --exe EXE     ceph executable [/usr/bin/ceph]
-	  -c CONF, --conf CONF  alternative ceph conf file
-	  -m MONADDRESS, --monaddress MONADDRESS
-	                        ceph monitor to use for queries (address[:port])
-	  -i ID, --id ID        ceph client id
-	  -k KEYRING, --keyring KEYRING
-	                        ceph client keyring file
-	  -V, --version         show version and exit
-	  -n NAME, --name NAME  mds daemon name
-	  -f FILESYSTEM, --filesystem FILESYSTEM
-	                        mds filesystem name
+    'ceph mds stat' nagios plugin.
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -e EXE, --exe EXE     ceph executable [/usr/bin/ceph]
+      -c CONF, --conf CONF  alternative ceph conf file
+      -m MONADDRESS, --monaddress MONADDRESS
+                            ceph monitor to use for queries (address[:port])
+      -i ID, --id ID        ceph client id
+      -k KEYRING, --keyring KEYRING
+                            ceph client keyring file
+      -V, --version         show version and exit
+      -n NAME, --name NAME  mds daemon name
+      -f FILESYSTEM, --filesystem FILESYSTEM
+                            mds filesystem name
 ### Example
-	nagios$ ./check_ceph_mds -f cephfs -n ceph-mds-1
-	MDS OK: MDS 'ceph-mds-1' is up:active
 
-	nagios$ ./check_ceph_mds -f cephfs -n ceph-mds-2
-	MDS OK: MDS 'ceph-mds-2' is up:standby
+    nagios$ ./check_ceph_mds -f cephfs -n ceph-mds-1
+    MDS OK: MDS 'ceph-mds-1' is up:active
 
-	nagios$ ./check_ceph_mds -f cephfs -n ceph-mds-1
-	MDS WARN: MDS 'ceph-mds-1' is up:active (laggy or crashed)
+    nagios$ ./check_ceph_mds -f cephfs -n ceph-mds-2
+    MDS OK: MDS 'ceph-mds-2' is up:standby
 
-	nagios$ ./check_ceph_mds -f cephfs -n ceph-mds-3
-	MDS ERROR: MDS 'ceph-mds-3' is not found (offline?)
+    nagios$ ./check_ceph_mds -f cephfs -n ceph-mds-1
+    MDS WARN: MDS 'ceph-mds-1' is up:active (laggy or crashed)
+
+    nagios$ ./check_ceph_mds -f cephfs -n ceph-mds-3
+    MDS ERROR: MDS 'ceph-mds-3' is not found (offline?)
+
+## check_ceph_mgr
+
+The `check_ceph_mgr` nagios plugin monitors the mgr.
+
+
+### Usage
+
+    usage: check_ceph_mgr [-h] [-e EXE] [-c CONF] [-m MONADDRESS] [-i ID]
+                        [-n NAME] [-k KEYRING] [-V]
+
+    'ceph mgr dump' nagios plugin.
+
+    optional arguments:
+    -h, --help            show this help message and exit
+    -e EXE, --exe EXE     ceph executable [/usr/bin/ceph]
+    -c CONF, --conf CONF  alternative ceph conf file
+    -m MONADDRESS, --monaddress MONADDRESS
+                            ceph monitor to use for queries (address[:port])
+    -i ID, --id ID        ceph client id
+    -n NAME, --name NAME  ceph client name
+    -k KEYRING, --keyring KEYRING
+                            ceph client keyring file
+    -V, --version         show version and exit
+
+### Example
+
+    nagios$ ./check_ceph_mgr
+    MGR OK: active: zhdk0013, standbys: zhdk0009, zhdk0025
 
 [ceph]: http://www.ceph.com
 [cephx]: http://ceph.com/docs/master/rados/operations/authentication/
