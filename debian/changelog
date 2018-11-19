@@ -1,3 +1,9 @@
+nagios-plugins-ceph (1.5.5-1) unstable; urgency=medium
+
+  * Upstream version 1.5.5
+
+ -- Valery Tschopp <valery.tschopp@switch.ch>  Mon, 19 Nov 2018 14:53:02 +0100
+
 nagios-plugins-ceph (1.5.1-1) unstable; urgency=medium
 
   * Added whitelist regexp filter for good/unhandled ceph health warnings
