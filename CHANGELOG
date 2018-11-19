@@ -1,5 +1,8 @@
 Nagios plugins for Ceph
 -----------------------
+Version 1.5.5:
+* `check_ceph_mgr` plugin added.
+
 Version 1.5.4:
 * `check_ceph_rgw_api` 'insecure' option added.
 
