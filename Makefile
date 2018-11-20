@@ -32,7 +32,8 @@ tmp_dir = $(CURDIR)/tmp
 .PHONY: clean dist install deb deb-src
 
 clean:
-	rm -rf $(tmp_dir) *.tar.gz *.deb *.dsc
+	rm -rf $(tmp_dir) 
+	rm -f *.tar.gz *.deb *.dsc *.xz
 
 dist:
 	@echo "Packaging sources"
