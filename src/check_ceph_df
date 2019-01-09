@@ -21,7 +21,7 @@ import os
 import subprocess
 import sys
 
-__version__ = '1.5.1'
+__version__ = '1.6.0'
 
 # default ceph values
 CEPH_COMMAND = '/usr/bin/ceph'
@@ -106,9 +106,16 @@ def main():
         result=output.splitlines()
         # values for GLOBAL are in 3rd line of output
         globalline = result[2]
-        globalvals = globalline.split(' ')
-        # strip all empty values from list
-        globalvals = [x for x in globalvals if x != '']
+        globalvals = globalline.split()
+        # Luminous vs Minic output (27.3TiB vs 27.3 TiB)
+        if len(globalvals) == 7:
+            gv = []
+            gv.append("{}{}".format(globalvals[0], globalvals[1]))
+            gv.append("{}{}".format(globalvals[2], globalvals[3]))
+            gv.append("{}{}".format(globalvals[4], globalvals[5]))
+            gv.append(globalvals[6])
+            globalvals = gv
+            #print "XXX: globalvals: {} {}".format(len(globalvals), globalvals)
 
         # prepare pool values
         # pool output starts in line 4 with the bare word POOLS: followed by the output
@@ -117,7 +124,18 @@ def main():
         if args.pool:
             for line in poollines:
                 if args.pool in line:
-                    poolvals = [x for x in line.split(' ') if x != '']
+                    poolvals = line.split()
+                    # Luminous vs Minic output (27.3TiB vs 27.3 TiB)
+                    if len(poolvals) == 8:
+                        pv = []
+                        pv.append(poolvals[0]) # NAME
+                        pv.append(poolvals[1]) # ID
+                        pv.append("{}{}".format(poolvals[2], poolvals[3])) # USED 27.3 TiB
+                        pv.append(poolvals[4]) # %USED
+                        pv.append("{}{}".format(poolvals[5], poolvals[6])) # MAX AVAIL 27.3 TiB
+                        pv.append(poolvals[7]) # OBJECTS
+                        poolvals = pv
+                        #print "XXX: poolvals: {} {}".format(len(poolvals), poolvals)
 
                     pool_used = poolvals[2]
                     pool_usage_percent = float(poolvals[3])
