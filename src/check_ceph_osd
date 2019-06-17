@@ -15,6 +15,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
+# 1.5.2 (2019-06-16) Martin Seener: fixed regex to work with Ceph Nautilus (14.2.x)
 
 import argparse
 import os
@@ -23,7 +24,7 @@ import subprocess
 import sys
 import socket
 
-__version__ = '1.5.1'
+__version__ = '1.5.2'
 
 # default ceph values
 CEPH_COMMAND = '/usr/bin/ceph'
@@ -115,15 +116,15 @@ def main():
   # escape IPv6 host address
   osd_host = osd_host.replace('[', '\[')
   osd_host = osd_host.replace(']', '\]')
-  up = re.findall(r"^(osd\.%s) up.* %s:" % (args.osdid, osd_host), output, re.MULTILINE)
+  up = re.findall(r"^(osd\.%s) up.*%s:" % (args.osdid, osd_host), output, re.MULTILINE)
   if args.out:
-    down = re.findall(r"^(osd\.%s) down.* %s:" % (args.osdid, osd_host), output, re.MULTILINE)
-    down_in = re.findall(r"^(osd\.%s) down[ ]+in.* %s:" % (args.osdid, osd_host), output, re.MULTILINE)
-    down_out = re.findall(r"^(osd\.%s) down[ ]+out.* %s:" % (args.osdid, osd_host), output, re.MULTILINE)
+    down = re.findall(r"^(osd\.%s) down.*%s:" % (args.osdid, osd_host), output, re.MULTILINE)
+    down_in = re.findall(r"^(osd\.%s) down[ ]+in.*%s:" % (args.osdid, osd_host), output, re.MULTILINE)
+    down_out = re.findall(r"^(osd\.%s) down[ ]+out.*%s:" % (args.osdid, osd_host), output, re.MULTILINE)
   else:
-    down = re.findall(r"^(osd\.%s) down[ ]+in.* %s:" % (args.osdid, osd_host), output, re.MULTILINE)
+    down = re.findall(r"^(osd\.%s) down[ ]+in.*%s:" % (args.osdid, osd_host), output, re.MULTILINE)
     down_in = down
-    down_out = re.findall(r"^(osd\.%s) down[ ]+out.* %s:" % (args.osdid, osd_host), output, re.MULTILINE)
+    down_out = re.findall(r"^(osd\.%s) down[ ]+out.*%s:" % (args.osdid, osd_host), output, re.MULTILINE)
 
   if down:
     print "OSD %s: Down OSD%s on %s: %s" % ('CRITICAL' if len(down)>=args.crit else 'WARNING' ,'s' if len(down)>1 else '', args.host, " ".join(down))
