@@ -21,7 +21,7 @@ import os
 import subprocess
 import sys
 
-__version__ = '1.6.0'
+__version__ = '1.7.0'
 
 # default ceph values
 CEPH_COMMAND = '/usr/bin/ceph'
@@ -116,6 +116,15 @@ def main():
             gv.append(globalvals[6])
             globalvals = gv
             #print "XXX: globalvals: {} {}".format(len(globalvals), globalvals)
+        # Nautilus output
+        if len(globalvals) == 10:
+            gv = []
+            gv.append("{}{}".format(globalvals[1], globalvals[2]))
+            gv.append("{}{}".format(globalvals[3], globalvals[4]))
+            gv.append("{}{}".format(globalvals[5], globalvals[6]))
+            gv.append(globalvals[9])
+            globalvals = gv
+            #print "XXX: globalvals: {} {}".format(len(globalvals), globalvals)
 
         # prepare pool values
         # pool output starts in line 4 with the bare word POOLS: followed by the output
@@ -133,14 +142,25 @@ def main():
                         pv.append("{}{}".format(poolvals[2], poolvals[3])) # USED 27.3 TiB
                         pv.append(poolvals[4]) # %USED
                         pv.append("{}{}".format(poolvals[5], poolvals[6])) # MAX AVAIL 27.3 TiB
-                        pv.append(poolvals[7]) # OBJECTS
+                        # pv.append(poolvals[7]) # OBJECTS
+                        poolvals = pv
+                        #print "XXX: poolvals: {} {}".format(len(poolvals), poolvals)
+                    # Nautilus output
+                    if len(poolvals) == 10:
+                        pv = []
+                        pv.append(poolvals[0]) # NAME
+                        pv.append(poolvals[1]) # ID
+                        pv.append("{}{}".format(poolvals[2], poolvals[3])) # USED 27.3 TiB
+                        pv.append(poolvals[7]) # %USED
+                        pv.append("{}{}".format(poolvals[8], poolvals[9])) # MAX AVAIL 27.3 TiB
+                        # pv.append(poolvals[7]) # OBJECTS, not used
                         poolvals = pv
                         #print "XXX: poolvals: {} {}".format(len(poolvals), poolvals)
 
                     pool_used = poolvals[2]
                     pool_usage_percent = float(poolvals[3])
                     pool_available_space = poolvals[4]
-                    pool_objects = float(poolvals[5])
+                    # pool_objects = float(poolvals[5]) # not used
 
                     if pool_usage_percent > args.critical:
                         print 'CRITICAL: %s%% usage in Pool \'%s\' is above %s%% (%s used) | Usage=%s%%;%s;%s;;' % (pool_usage_percent, args.pool, args.critical, pool_used, pool_usage_percent, args.warn, args.critical)
