@@ -25,7 +25,7 @@ import subprocess
 import sys
 import json
 
-__version__ = '1.5.0'
+__version__ = '1.6.0'
 
 # default ceph values
 CEPH_EXEC = '/usr/bin/ceph'
@@ -112,16 +112,22 @@ def check_target_mds(mds_stat, fs_name, name):
 
     # find mds from active list
     active_mdss = _get_active_mds(mds_stat, fs_name)
-    for mds in active_mdss:
-        if mds.get_name() != name:
-            continue
-        # target mds in active list
-        print "MDS %s: %s" % ("WARN" if mds.is_laggy() else "OK", mds)
-        return STATUS_WARNING if mds.is_laggy() else STATUS_OK
 
-    # not found
-    print "MDS ERROR: MDS '%s' is not found (offline?)" % (name)
-    return STATUS_ERROR
+    if active_mdss:
+        for mds in active_mdss:
+            if mds.get_name() != name:
+                continue
+            # target mds in active list
+            print "MDS %s: %s" % ("WARN" if mds.is_laggy() else "OK", mds)
+            return STATUS_WARNING if mds.is_laggy() else STATUS_OK
+
+        # mds not found
+        print "MDS ERROR: MDS '%s' is not found (offline?)" % (name)
+        return STATUS_ERROR
+    else:
+        # fs not found in map, perhaps user input error
+        print "MDS ERROR: FS '%s' is not found in fsmap" % (fs_name)
+        return STATUS_ERROR
 
 def _get_standby_mds(mds_stat):
     mds_array = []
