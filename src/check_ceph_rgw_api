@@ -17,12 +17,13 @@
 #  limitations under the License.
 
 import requests
+import warnings
 import json
 import argparse
 import sys
 from awsauth import S3Auth
 
-__version__ = '1.5.4'
+__version__ = '1.7.1'
 
 # nagios exit code
 STATUS_OK = 0
@@ -62,7 +63,7 @@ def main():
       # Inversion of condition, when '--insecure' is defined we disable
       # requests warning about certificate hostname mismatch.
       if not args.insecure:
-          requests.packages.urllib3.disable_warnings()
+          warnings.filterwarnings('ignore', message='Unverified HTTPS request')
 
       response = requests.get(url, verify=args.insecure,
                               auth=S3Auth(args.access_key, args.secret_key,
