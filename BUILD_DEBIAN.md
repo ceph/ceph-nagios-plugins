@@ -6,7 +6,7 @@ You can build a Debian package (source and binary)
 
 To build the package first install the required package building dependencies:
 
-    sudo apt-get install build-essential fakeroot devscripts
+    sudo apt-get install build-essential fakeroot devscripts python debhelper dh-python
 
 ## Build package
 
