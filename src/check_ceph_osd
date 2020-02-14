@@ -107,6 +107,7 @@ def main():
   # exec command
   p = subprocess.Popen(ceph_cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
   output, err = p.communicate()
+  output = output.decode('utf8')
 
   if err or not output:
     print("OSD ERROR: %s" % err)

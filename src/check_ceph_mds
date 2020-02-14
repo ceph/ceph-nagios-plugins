@@ -133,8 +133,8 @@ def check_target_mds(mds_stat, fs_name, name):
 def _get_standby_mds(mds_stat):
     mds_array = []
     for mds in mds_stat['fsmap']['standbys']:
-        name = mds['name'].encode('utf8')
-        state = mds['state'].encode('utf8')
+        name = mds['name']
+        state = mds['state']
         laggy_since = mds['laggy_since'] if 'laggy_since' in mds else None
         mds_array.append(MDS(name, state))
 
@@ -152,8 +152,8 @@ def _get_active_mds(mds_stat, fs_name):
         mds_array = []
         infos = mds_stat['fsmap']['filesystems'][i]['mdsmap']['info']
         for gid in infos:
-            name = infos[gid]['name'].encode('utf8')
-            state = infos[gid]['state'].encode('utf8')
+            name = infos[gid]['name']
+            state = infos[gid]['state']
             laggy_since = infos[gid]['laggy_since'] if 'laggy_since' in infos[gid] else None
             mds_array.append(MDS(name, state, laggy_since))
 

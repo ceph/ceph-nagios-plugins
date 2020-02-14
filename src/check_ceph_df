@@ -68,7 +68,7 @@ def main():
         print("ERROR: keyring file '%s' doesn't exist" % args.keyring)
         return STATUS_UNKNOWN
 
-    if args.warn > args.critical or not args.warn or not args.critical:
+    if not args.warn or not args.critical or args.warn > args.critical:
         print("ERROR: warn and critical level must be set and critical must be greater than warn")
         return STATUS_UNKNOWN
 
