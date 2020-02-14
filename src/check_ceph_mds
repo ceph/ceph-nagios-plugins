@@ -17,6 +17,7 @@
 #  limitations under the License.
 
 
+from __future__ import print_function
 import argparse
 import socket
 import os
@@ -51,21 +52,21 @@ def main():
     args = parser.parse_args()
 
     if args.version:
-        print 'version %s' % __version__
+        print('version %s' % __version__)
         return STATUS_OK
 
     # validate args
     ceph_exec = args.exe if args.exe else CEPH_EXEC
     if not os.path.exists(ceph_exec):
-        print "MDS ERROR: ceph executable '%s' doesn't exist" % ceph_exec
+        print("MDS ERROR: ceph executable '%s' doesn't exist" % ceph_exec)
         return STATUS_UNKNOWN
 
     if args.conf and not os.path.exists(args.conf):
-        print "MDS ERROR: ceph conf file '%s' doesn't exist" % args.conf
+        print("MDS ERROR: ceph conf file '%s' doesn't exist" % args.conf)
         return STATUS_UNKNOWN
 
     if args.keyring and not os.path.exists(args.keyring):
-        print "MDS ERROR: keyring file '%s' doesn't exist" % args.keyring
+        print("MDS ERROR: keyring file '%s' doesn't exist" % args.keyring)
         return STATUS_UNKNOWN
 
     # build command
@@ -89,7 +90,7 @@ def main():
     output, err = p.communicate()
 
     if p.returncode != 0 or not output:
-        print "MDS ERROR: %s" % err
+        print("MDS ERROR: %s" % err)
         return STATUS_ERROR
 
     # load json output and parse
@@ -97,7 +98,7 @@ def main():
     try:
         mds_stat = json.loads(output)
     except Exception as e:
-        print "MDS ERROR: could not parse '%s' output: %s: %s" % (CEPH_COMMAND,output,e)
+        print("MDS ERROR: could not parse '%s' output: %s: %s" % (CEPH_COMMAND,output,e))
         return STATUS_UNKNOWN
 
     return check_target_mds(mds_stat, args.filesystem, args.name)
@@ -107,7 +108,7 @@ def check_target_mds(mds_stat, fs_name, name):
     standby_mdss = _get_standby_mds(mds_stat)
     for mds in standby_mdss:
         if mds.get_name() == name:
-            print "MDS OK: %s" % (mds)
+            print("MDS OK: %s" % (mds))
             return STATUS_OK
 
     # find mds from active list
@@ -118,15 +119,15 @@ def check_target_mds(mds_stat, fs_name, name):
             if mds.get_name() != name:
                 continue
             # target mds in active list
-            print "MDS %s: %s" % ("WARN" if mds.is_laggy() else "OK", mds)
+            print("MDS %s: %s" % ("WARN" if mds.is_laggy() else "OK", mds))
             return STATUS_WARNING if mds.is_laggy() else STATUS_OK
 
         # mds not found
-        print "MDS ERROR: MDS '%s' is not found (offline?)" % (name)
+        print("MDS ERROR: MDS '%s' is not found (offline?)" % (name))
         return STATUS_ERROR
     else:
         # fs not found in map, perhaps user input error
-        print "MDS ERROR: FS '%s' is not found in fsmap" % (fs_name)
+        print("MDS ERROR: FS '%s' is not found in fsmap" % (fs_name))
         return STATUS_ERROR
 
 def _get_standby_mds(mds_stat):
@@ -143,7 +144,7 @@ def _get_active_mds(mds_stat, fs_name):
     mds_fs = mds_stat['fsmap']['filesystems']
 
     # find filesystem in stat
-    for i in xrange(len(mds_fs)):
+    for i in range(len(mds_fs)):
         mdsmap = mds_fs[i]['mdsmap']
         if mdsmap['fs_name'] != fs_name:
             continue

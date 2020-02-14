@@ -17,6 +17,7 @@
 #
 # 1.5.2 (2019-06-16) Martin Seener: fixed regex to work with Ceph Nautilus (14.2.x)
 
+from __future__ import print_function
 import argparse
 import os
 import re
@@ -54,26 +55,26 @@ def main():
   # validate args
   ceph_exec = args.exe if args.exe else CEPH_COMMAND
   if not os.path.exists(ceph_exec):
-    print "OSD ERROR: ceph executable '%s' doesn't exist" % ceph_exec
+    print("OSD ERROR: ceph executable '%s' doesn't exist" % ceph_exec)
     return STATUS_UNKNOWN
 
   if args.version:
-    print 'version %s' % __version__
+    print('version %s' % __version__)
     return STATUS_OK
 
   if args.conf and not os.path.exists(args.conf):
-    print "OSD ERROR: ceph conf file '%s' doesn't exist" % args.conf
+    print("OSD ERROR: ceph conf file '%s' doesn't exist" % args.conf)
     return STATUS_UNKNOWN
 
   if args.keyring and not os.path.exists(args.keyring):
-    print "OSD ERROR: keyring file '%s' doesn't exist" % args.keyring
+    print("OSD ERROR: keyring file '%s' doesn't exist" % args.keyring)
     return STATUS_UNKNOWN
 
   if not args.osdid:
     args.osdid = '[^ ]*'
 
   if not args.host:
-    print "OSD ERROR: no OSD hostname given"
+    print("OSD ERROR: no OSD hostname given")
     return STATUS_UNKNOWN
 
   try:
@@ -82,7 +83,7 @@ def main():
     if addrinfo[0][0] == socket.AF_INET6:
       args.host = "[%s]" % args.host
   except:
-    print 'OSD ERROR: could not resolve %s' % args.host
+    print('OSD ERROR: could not resolve %s' % args.host)
     return STATUS_UNKNOWN
 
 
@@ -108,7 +109,7 @@ def main():
   output, err = p.communicate()
 
   if err or not output:
-    print "OSD ERROR: %s" % err
+    print("OSD ERROR: %s" % err)
     return STATUS_ERROR
 
   # escape IPv4 host address
@@ -127,25 +128,25 @@ def main():
     down_out = re.findall(r"^(osd\.%s) down[ ]+out.*%s:" % (args.osdid, osd_host), output, re.MULTILINE)
 
   if down:
-    print "OSD %s: Down OSD%s on %s: %s" % ('CRITICAL' if len(down)>=args.crit else 'WARNING' ,'s' if len(down)>1 else '', args.host, " ".join(down))
-    print "Up OSDs: " + " ".join(up)
-    print "Down+In OSDs: " + " ".join(down_in)
-    print "Down+Out OSDs: " + " ".join(down_out)
-    print "| 'osd_up'=%d 'osd_down_in'=%d;;%d 'osd_down_out'=%d;;%d" % (len(up), len(down_in), args.crit, len(down_out), args.crit)
+    print("OSD %s: Down OSD%s on %s: %s" % ('CRITICAL' if len(down)>=args.crit else 'WARNING' ,'s' if len(down)>1 else '', args.host, " ".join(down)))
+    print("Up OSDs: " + " ".join(up))
+    print("Down+In OSDs: " + " ".join(down_in))
+    print("Down+Out OSDs: " + " ".join(down_out))
+    print("| 'osd_up'=%d 'osd_down_in'=%d;;%d 'osd_down_out'=%d;;%d" % (len(up), len(down_in), args.crit, len(down_out), args.crit))
     if len(down)>=args.crit:
       return STATUS_ERROR
     else:
       return STATUS_WARNING
 
   if up:
-    print "OSD OK"
-    print "Up OSDs: " + " ".join(up)
-    print "Down+In OSDs: " + " ".join(down_in)
-    print "Down+Out OSDs: " + " ".join(down_out)
-    print "| 'osd_up'=%d 'osd_down_in'=%d;;%d 'osd_down_out'=%d;;%d" % (len(up), len(down_in), args.crit, len(down_out), args.crit)
+    print("OSD OK")
+    print("Up OSDs: " + " ".join(up))
+    print("Down+In OSDs: " + " ".join(down_in))
+    print("Down+Out OSDs: " + " ".join(down_out))
+    print("| 'osd_up'=%d 'osd_down_in'=%d;;%d 'osd_down_out'=%d;;%d" % (len(up), len(down_in), args.crit, len(down_out), args.crit))
     return STATUS_OK
 
-  print "OSD WARN: no OSD.%s found on host %s" % (args.osdid, args.host)
+  print("OSD WARN: no OSD.%s found on host %s" % (args.osdid, args.host))
   return STATUS_WARNING
 
 if __name__ == "__main__":

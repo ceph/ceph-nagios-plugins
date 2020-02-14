@@ -16,6 +16,7 @@
 #  limitations under the License.
 #
 
+from __future__ import print_function
 import argparse
 import os
 import subprocess
@@ -52,23 +53,23 @@ def main():
     # validate args
     ceph_exec = args.exe if args.exe else CEPH_COMMAND
     if not os.path.exists(ceph_exec):
-        print "ERROR: ceph executable '%s' doesn't exist" % ceph_exec
+        print("ERROR: ceph executable '%s' doesn't exist" % ceph_exec)
         return STATUS_UNKNOWN
 
     if args.version:
-        print 'version %s' % __version__
+        print('version %s' % __version__)
         return STATUS_OK
 
     if args.conf and not os.path.exists(args.conf):
-        print "ERROR: ceph conf file '%s' doesn't exist" % args.conf
+        print("ERROR: ceph conf file '%s' doesn't exist" % args.conf)
         return STATUS_UNKNOWN
 
     if args.keyring and not os.path.exists(args.keyring):
-        print "ERROR: keyring file '%s' doesn't exist" % args.keyring
+        print("ERROR: keyring file '%s' doesn't exist" % args.keyring)
         return STATUS_UNKNOWN
 
     if args.warn > args.critical or not args.warn or not args.critical:
-        print "ERROR: warn and critical level must be set and critical must be greater than warn"
+        print("ERROR: warn and critical level must be set and critical must be greater than warn")
         return STATUS_UNKNOWN
 
     # build command
@@ -176,13 +177,13 @@ def main():
                     # pool_objects = float(poolvals[5]) # not used
 
                     if pool_usage_percent > args.critical:
-                        print 'CRITICAL: %s%% usage in Pool \'%s\' is above %s%% (%s used) | Usage=%s%%;%s;%s;;' % (pool_usage_percent, args.pool, args.critical, pool_used, pool_usage_percent, args.warn, args.critical)
+                        print('CRITICAL: %s%% usage in Pool \'%s\' is above %s%% (%s used) | Usage=%s%%;%s;%s;;' % (pool_usage_percent, args.pool, args.critical, pool_used, pool_usage_percent, args.warn, args.critical))
                         return STATUS_ERROR
                     if pool_usage_percent > args.warn:
-                        print 'WARNING: %s%% usage in Pool \'%s\' is above %s%% (%s used) | Usage=%s%%;%s;%s;;' % (pool_usage_percent, args.pool, args.warn, pool_used, pool_usage_percent, args.warn, args.critical)
+                        print('WARNING: %s%% usage in Pool \'%s\' is above %s%% (%s used) | Usage=%s%%;%s;%s;;' % (pool_usage_percent, args.pool, args.warn, pool_used, pool_usage_percent, args.warn, args.critical))
                         return STATUS_WARNING
                     else:
-                        print '%s%% usage in Pool \'%s\' | Usage=%s%%;%s;%s;;' % (pool_usage_percent, args.pool, pool_usage_percent, args.warn, args.critical)
+                        print('%s%% usage in Pool \'%s\' | Usage=%s%%;%s;%s;;' % (pool_usage_percent, args.pool, pool_usage_percent, args.warn, args.critical))
                         return STATUS_OK
         else:
             # print 'DEBUG:', globalvals
@@ -199,7 +200,7 @@ def main():
                         poolout = '\n '.join(poollines)
                 else:
                         poolout = ''
-                print 'CRITICAL: global RAW usage of %s%% is above %s%% (%s of %s free)%s | Usage=%s%%;%s;%s;;' % (global_usage_percent, args.critical, global_available_space, global_total_space, poolout, global_usage_percent, args.warn, args.critical)
+                print('CRITICAL: global RAW usage of %s%% is above %s%% (%s of %s free)%s | Usage=%s%%;%s;%s;;' % (global_usage_percent, args.critical, global_available_space, global_total_space, poolout, global_usage_percent, args.warn, args.critical))
                 return STATUS_ERROR
             elif global_usage_percent > args.warn:
                 if args.detail:
@@ -207,10 +208,10 @@ def main():
                         poolout = '\n '.join(poollines)
                 else:
                         poolout = ''
-                print 'WARNING: global RAW usage of %s%% is above %s%% (%s of %s free)%s | Usage=%s%%;%s;%s;;' % (global_usage_percent, args.warn, global_available_space, global_total_space, poolout, global_usage_percent, args.warn, args.critical)
+                print('WARNING: global RAW usage of %s%% is above %s%% (%s of %s free)%s | Usage=%s%%;%s;%s;;' % (global_usage_percent, args.warn, global_available_space, global_total_space, poolout, global_usage_percent, args.warn, args.critical))
                 return STATUS_WARNING
             else:
-                print 'RAW usage %s%% | Usage=%s%%;%s;%s;;' % (global_usage_percent, global_usage_percent, args.warn, args.critical)
+                print('RAW usage %s%% | Usage=%s%%;%s;%s;;' % (global_usage_percent, global_usage_percent, args.warn, args.critical))
                 return STATUS_OK
 
         #for
@@ -219,9 +220,9 @@ def main():
         one_line = err.split('\n')[0]
         if '-1 ' in one_line:
             idx = one_line.rfind('-1 ')
-            print 'ERROR: %s: %s' % (ceph_exec, one_line[idx+len('-1 '):])
+            print('ERROR: %s: %s' % (ceph_exec, one_line[idx+len('-1 '):]))
         else:
-            print one_line
+            print(one_line)
 
     return STATUS_UNKNOWN
 
