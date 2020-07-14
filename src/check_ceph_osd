@@ -47,7 +47,7 @@ def main():
   parser.add_argument('-V','--version', help='show version and exit', action='store_true')
   parser.add_argument('-H','--host', help='osd host', required=True)
   parser.add_argument('-I','--osdid', help='osd id', required=False)
-  parser.add_argument('-C','--crit', help='Number of failed OSDs to tigger critical (default=2)',type=int,default=2, required=False)
+  parser.add_argument('-C','--crit', help='Number of failed OSDs to trigger critical (default=2)',type=int,default=2, required=False)
   parser.add_argument('-o','--out', help='check osds that are set OUT', default=False, action='store_true', required=False)
   args = parser.parse_args()
 
