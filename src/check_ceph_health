@@ -23,7 +23,7 @@ import sys
 import re
 import json
 
-__version__ = '1.5.2'
+__version__ = '1.6.0'
 
 # default ceph values
 CEPH_COMMAND = '/usr/bin/ceph'
@@ -45,6 +45,8 @@ def main():
     parser.add_argument('-i','--id', help='ceph client id')
     parser.add_argument('-n','--name', help='ceph client name')
     parser.add_argument('-k','--keyring', help='ceph client keyring file')
+    parser.add_argument('--check', help='regexp of which check(s) to check (luminous+) '
+                        "Can be inverted, e.g. '^((?!PG_DEGRADED|OBJECT_MISPLACED).)*$'")
     parser.add_argument('-w','--whitelist', help='whitelist regexp for ceph health warnings')
     parser.add_argument('-d','--detail', help="exec 'ceph health detail'", action='store_true')
     parser.add_argument('-V','--version', help='show version and exit', action='store_true')
@@ -114,6 +116,10 @@ def main():
         if output.has_key('checks'):
             #luminous
             for check,status in output['checks'].iteritems():
+                # skip check if not selected
+                if args.check and not re.search(args.check, check):
+                    continue
+
                 if status["severity"] == "HEALTH_ERR":
                     extended += msg
                     msg = "CRITCAL: %s( %s )" % (check,status['summary']['message'])
