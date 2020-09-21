@@ -17,6 +17,7 @@ And use this keyring with the plugin:
 ## check_ceph_health
 
 The `check_ceph_health` nagios plugin monitors the ceph cluster, and report its health.
+Can be filtered to only look at certain [health checks](https://docs.ceph.com/en/latest/rados/operations/health-checks/).
 
 ### Usage
 
