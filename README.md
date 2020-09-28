@@ -17,6 +17,7 @@ And use this keyring with the plugin:
 ## check_ceph_health
 
 The `check_ceph_health` nagios plugin monitors the ceph cluster, and report its health.
+Can be filtered to only look at certain [health checks](https://docs.ceph.com/en/latest/rados/operations/health-checks/).
 
 ### Usage
 
@@ -34,6 +35,8 @@ The `check_ceph_health` nagios plugin monitors the ceph cluster, and report its 
       -n NAME, --name NAME  ceph client name
       -k KEYRING, --keyring KEYRING
                             ceph client keyring file
+      --check CHECK         regexp of which check(s) to check (luminous+) Can be
+                            inverted, e.g. '^((?!PG_DEGRADED|OBJECT_MISPLACED).)*$'
       -w, --whitelist REGEXP
                             whitelist regexp for ceph health warnings
       -d, --detail          exec 'ceph health detail'
@@ -48,6 +51,19 @@ The `check_ceph_health` nagios plugin monitors the ceph cluster, and report its 
     nagios$
 
     nagios$ ./check_ceph_health --id nagios --whitelist 'requests.are.blocked(\s)*32.sec'
+
+    nagios$ ./check_ceph_health --id nagios
+    WARNING: MON_CLOCK_SKEW( clock skew detected on mon.a )
+    OBJECT_MISPLACED( 1937172/695961284 objects misplaced (0.278%) )
+    PG_DEGRADED( Degraded data redundancy: 98/695961284 objects degraded (0.000%), 1 pg degraded )
+
+    nagios$ ./check_ceph_health --id nagios --check 'PG_DEGRADED|OBJECT_MISPLACED'
+    WARNING: OBJECT_MISPLACED( 1937172/695961284 objects misplaced (0.278%) )
+    PG_DEGRADED( Degraded data redundancy: 98/695961284 objects degraded (0.000%), 1 pg degraded )
+
+    nagios$ ./check_ceph_health --id nagios --check '^((?!PG_DEGRADED|OBJECT_MISPLACED).)*$'
+    WARNING: MON_CLOCK_SKEW( clock skew detected on mon.a )
+
 
 ## check_ceph_mon
 
