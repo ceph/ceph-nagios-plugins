@@ -15,9 +15,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
-# changes:
-# 2017-07-27: add client name option, André Klausnitzer <info@b1-systems.de>
+
 
 import argparse
 import os
@@ -26,7 +24,7 @@ import subprocess
 import sys
 import json
 
-__version__ = '1.5.0'
+__version__ = '1.5.1'
 
 # default ceph values
 RGW_COMMAND = '/usr/bin/radosgw-admin'
@@ -88,17 +86,19 @@ def main():
 
   bucket_stats = json.loads(output)
   #print bucket_stats
+
   buckets = []
   for i in bucket_stats:
     if type(i) is dict:
       bucket_name = i['bucket']
       usage_dict = i['usage']
-      if not usage_dict:
-        bucket_usage_kb = 0
-      else:
+      if usage_dict and 'rgw.main' in usage_dict:
         bucket_usage_kb = usage_dict['rgw.main']['size_kb_actual']
+      else:
+        bucket_usage_kb = 0
       buckets.append((bucket_name, bucket_usage_kb))
-  buckets_total_kb =  sum([b[1] for b in buckets])
+  buckets_total_kb = sum([b[1] for b in buckets])
+
   if args.byte:
     status = "RGW OK: {} buckets, {} KB total | /={}B ".format(len(buckets),buckets_total_kb,buckets_total_kb*1024)
   else:
