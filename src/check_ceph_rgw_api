@@ -16,6 +16,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+
 import requests
 import warnings
 import json
@@ -23,7 +24,7 @@ import argparse
 import sys
 from awsauth import S3Auth
 
-__version__ = '1.7.1'
+__version__ = '1.7.2'
 
 # nagios exit code
 STATUS_OK = 0
@@ -88,10 +89,10 @@ def main():
     if type(i) is dict:
       bucket_name = i['bucket']
       usage_dict = i['usage']
-      if not usage_dict:
-        bucket_usage_kb = 0
-      else:
+      if usage_dict and 'rgw.main' in usage_dict:
         bucket_usage_kb = usage_dict['rgw.main']['size_kb_actual']
+      else:
+        bucket_usage_kb = 0
       buckets.append((bucket_name, bucket_usage_kb))
   buckets_total_kb = sum([b[1] for b in buckets])
 
