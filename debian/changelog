@@ -1,3 +1,9 @@
+nagios-plugins-ceph (1.5.6-1) unstable; urgency=medium
+
+  * Upstream version 1.5.6
+
+ -- Valery Tschopp <valery.tschopp@switch.ch>  Mon, 04 Jan 2021 08:59:02 +0000
+
 nagios-plugins-ceph (1.5.5-1) unstable; urgency=medium
 
   * Upstream version 1.5.5
