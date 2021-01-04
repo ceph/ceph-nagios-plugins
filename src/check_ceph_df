@@ -156,6 +156,19 @@ def main():
                         # pv.append(poolvals[7]) # OBJECTS, not used
                         poolvals = pv
                         #print "XXX: poolvals: {} {}".format(len(poolvals), poolvals)
+                    # Octopus >= v15.2.8 (pgs added to ceph-df)
+                    if len(poolvals) == 11:
+                        pv = []
+                        pv.append(poolvals[0]) # NAME
+                        pv.append(poolvals[1]) # ID
+                        #pv.append(poolvals[2]) # PGS, not used
+                        pv.append("{}{}".format(poolvals[3], poolvals[4])) # USED 27.3 TiB
+                        pv.append(poolvals[8]) # %USED
+                        pv.append("{}{}".format(poolvals[9], poolvals[10])) # MAX AVAIL 27.3 TiB
+                        # pv.append(poolvals[7]) # OBJECTS, not used
+                        poolvals = pv
+                        #print "XXX: poolvals: {} {}".format(len(poolvals), poolvals)
+
 
                     pool_used = poolvals[2]
                     pool_usage_percent = float(poolvals[3])
