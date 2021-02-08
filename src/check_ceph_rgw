@@ -17,6 +17,7 @@
 #  limitations under the License.
 
 
+from __future__ import print_function
 import argparse
 import os
 import re
@@ -51,15 +52,15 @@ def main():
   # validate args
   rgw_exec = args.exe if args.exe else RGW_COMMAND
   if not os.path.exists(rgw_exec):
-    print "RGW ERROR: radosgw-admin executable '%s' doesn't exist" % rgw_exec
+    print("RGW ERROR: radosgw-admin executable '%s' doesn't exist" % rgw_exec)
     return STATUS_UNKNOWN
 
   if args.version:
-    print 'version %s' % __version__
+    print('version %s' % __version__)
     return STATUS_OK
 
   if args.conf and not os.path.exists(args.conf):
-    print "RGW ERROR: ceph conf file '%s' doesn't exist" % args.conf
+    print("RGW ERROR: ceph conf file '%s' doesn't exist" % args.conf)
     return STATUS_UNKNOWN
 
   # build command
@@ -81,7 +82,7 @@ def main():
   output, err = p.communicate()
 
   if p.returncode != 0 or not output:
-    print "RGW ERROR: %s :: %s" % (output, err)
+    print("RGW ERROR: %s :: %s" % (output, err))
     return STATUS_ERROR
 
   bucket_stats = json.loads(output)
@@ -110,7 +111,7 @@ def main():
     else:
       status = status + " ".join(["{}={}KB".format(b[0],b[1]) for b in buckets])
 
-  print status
+  print(status)
   return STATUS_OK
 
 if __name__ == "__main__":

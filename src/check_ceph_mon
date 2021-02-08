@@ -17,6 +17,7 @@
 #  limitations under the License.
 #
 
+from __future__ import print_function
 import argparse
 import socket
 import os
@@ -85,25 +86,25 @@ def main():
   args = parser.parse_args()
 
   if args.version:
-    print 'version %s' % __version__
+    print('version %s' % __version__)
     return STATUS_OK
 
   # validate args
   ceph_exec = args.exe if args.exe else CEPH_EXEC
   if not os.path.exists(ceph_exec):
-    print "MON ERROR: ceph executable '%s' doesn't exist" % ceph_exec
+    print("MON ERROR: ceph executable '%s' doesn't exist" % ceph_exec)
     return STATUS_UNKNOWN
 
   if args.conf and not os.path.exists(args.conf):
-    print "MON ERROR: ceph conf file '%s' doesn't exist" % args.conf
+    print("MON ERROR: ceph conf file '%s' doesn't exist" % args.conf)
     return STATUS_UNKNOWN
 
   if args.keyring and not os.path.exists(args.keyring):
-    print "MON ERROR: keyring file '%s' doesn't exist" % args.keyring
+    print("MON ERROR: keyring file '%s' doesn't exist" % args.keyring)
     return STATUS_UNKNOWN
 
   if not args.monid:
-    print "MON ERROR: no MON ID given, use -I/--monid parameter"
+    print("MON ERROR: no MON ID given, use -I/--monid parameter")
     return STATUS_UNKNOWN
 
   # build command
@@ -127,7 +128,7 @@ def main():
   output, err = p.communicate()
 
   if p.returncode != 0 or not output:
-    print "MON ERROR: %s" % err
+    print("MON ERROR: %s" % err)
     return STATUS_ERROR
 
   # load json output and parse
@@ -135,7 +136,7 @@ def main():
   try:
     quorum_status = json.loads(output)
   except Exception as e:
-    print "MON ERROR: could not parse '%s' output: %s: %s" % (CEPH_COMMAND,output,e)
+    print("MON ERROR: could not parse '%s' output: %s: %s" % (CEPH_COMMAND,output,e))
     return STATUS_UNKNOWN
 
   #print "XXX: quorum_status['quorum_names']:", quorum_status['quorum_names']
@@ -146,15 +147,15 @@ def main():
     if mon['name'] == args.monid:
       is_monitor = True
   if not is_monitor:
-    print "MON WARN: mon '%s' is not in monmap: %s" % (args.monid,quorum_status['monmap']['mons'])
+    print("MON WARN: mon '%s' is not in monmap: %s" % (args.monid,quorum_status['monmap']['mons']))
     return STATUS_WARNING
 
   in_quorum = args.monid in quorum_status['quorum_names']
   if in_quorum:
-    print "MON OK"
+    print("MON OK")
     return STATUS_OK
   else:
-    print "MON WARN: no MON '%s' found in quorum" % args.monid
+    print("MON WARN: no MON '%s' found in quorum" % args.monid)
     return STATUS_WARNING
 
 # main
