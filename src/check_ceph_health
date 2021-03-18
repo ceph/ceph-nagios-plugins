@@ -24,9 +24,10 @@ import sys
 import re
 import json
 
-__version__ = '1.6.0'
+__version__ = '1.7.0'
 
 # default ceph values
+CEPH_ADM_COMMAND = '/usr/sbin/cephadm'
 CEPH_COMMAND = '/usr/bin/ceph'
 
 # nagios exit code
@@ -40,6 +41,7 @@ def main():
     # parse args
     parser = argparse.ArgumentParser(description="'ceph health' nagios plugin.")
     parser.add_argument('-e','--exe', help='ceph executable [%s]' % CEPH_COMMAND)
+    parser.add_argument('-A','--admexe', help='cephadm executable [%s]' % CEPH_ADM_COMMAND)
     parser.add_argument('--cluster', help='ceph cluster name')
     parser.add_argument('-c','--conf', help='alternative ceph conf file')
     parser.add_argument('-m','--monaddress', help='ceph monitor address[:port]')
@@ -51,13 +53,21 @@ def main():
     parser.add_argument('-w','--whitelist', help='whitelist regexp for ceph health warnings')
     parser.add_argument('-d','--detail', help="exec 'ceph health detail'", action='store_true')
     parser.add_argument('-V','--version', help='show version and exit', action='store_true')
+    parser.add_argument('-a','--cephadm', help='uses cephadm to execute the command', action='store_true')
     args = parser.parse_args()
 
     # validate args
+    cephadm_exec = args.admexe if args.admexe else CEPH_ADM_COMMAND
     ceph_exec = args.exe if args.exe else CEPH_COMMAND
-    if not os.path.exists(ceph_exec):
-        print("ERROR: ceph executable '%s' doesn't exist" % ceph_exec)
-        return STATUS_UNKNOWN
+
+    if args.cephadm:
+        if not os.path.exists(cephadm_exec):
+            print("ERROR: cephadm executable '%s' doesn't exist" % cephadm_exec)
+            return STATUS_UNKNOWN
+    else:
+        if not os.path.exists(ceph_exec):
+            print("ERROR: ceph executable '%s' doesn't exist" % ceph_exec)
+            return STATUS_UNKNOWN
 
     if args.version:
         print('version %s' % __version__)
@@ -73,6 +83,11 @@ def main():
 
     # build command
     ceph_health = [ceph_exec]
+
+    if args.cephadm:
+        # Prepend the command with the cephadm binary and the shell command
+        ceph_health = [cephadm_exec, 'shell'] + ceph_health
+
     if args.monaddress:
         ceph_health.append('-m')
         ceph_health.append(args.monaddress)
@@ -97,7 +112,7 @@ def main():
 
     ceph_health.append('--format')
     ceph_health.append('json')
-    #print ceph_health
+    #print(ceph_health)
 
     # exec command
     p = subprocess.Popen(ceph_health,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
