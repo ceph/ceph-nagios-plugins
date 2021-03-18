@@ -24,7 +24,7 @@ import sys
 import re
 import json
 
-__version__ = '1.6.0'
+__version__ = '1.7.0'
 
 # default ceph values
 CEPH_ADM_COMMAND = '/usr/sbin/cephadm'
@@ -62,7 +62,7 @@ def main():
 
     if args.cephadm:
         if not os.path.exists(cephadm_exec):
-            print("ERROR: cephadm executable '%s' doesn't exist" % ceph_exec)
+            print("ERROR: cephadm executable '%s' doesn't exist" % cephadm_exec)
             return STATUS_UNKNOWN
     else:
         if not os.path.exists(ceph_exec):
