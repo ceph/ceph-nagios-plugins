@@ -86,8 +86,7 @@ def main():
 
     if args.cephadm:
         # Prepend the command with the cephadm binary and the shell command
-        ceph_health.insert(0, cephadm_exec)
-        ceph_health.insert(1, 'shell')
+        ceph_health = [cephadm_exec, 'shell'] + ceph_health
 
     if args.monaddress:
         ceph_health.append('-m')
