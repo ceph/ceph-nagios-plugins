@@ -54,6 +54,7 @@ def main():
     parser.add_argument('-d','--detail', help="exec 'ceph health detail'", action='store_true')
     parser.add_argument('-V','--version', help='show version and exit', action='store_true')
     parser.add_argument('-a','--cephadm', help='uses cephadm to execute the command', action='store_true')
+    parser.add_argument('-s','--skip-muted', help='skip muted checks', action='store_true')
     args = parser.parse_args()
 
     # validate args
@@ -134,6 +135,9 @@ def main():
             for check,status in output['checks'].items():
                  # skip check if not selected
                 if args.check and not re.search(args.check, check):
+                    continue
+
+                if args.skip_muted and ('muted' in status and status['muted']):
                     continue
 
                 if status["severity"] == "HEALTH_ERR":
