@@ -22,7 +22,7 @@ import os
 import subprocess
 import sys
 
-__version__ = '1.7.0'
+__version__ = '1.7.1'
 
 # default ceph values
 CEPH_COMMAND = '/usr/bin/ceph'
@@ -101,6 +101,7 @@ def main():
     # print "DEBUG: output:", output
     # print "DEBUG: err:", err
     if output:
+        output = output.decode('utf-8')
         # parse output
         # if detail switch was not set only show global values and compare to warning and critical
         # otherwise show space for pools too
