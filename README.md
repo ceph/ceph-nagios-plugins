@@ -364,5 +364,10 @@ The `check_ceph_mgr` nagios plugin monitors the mgr.
     nagios$ ./check_ceph_mgr
     MGR OK: active: zhdk0013, standbys: zhdk0009, zhdk0025
 
+## check_ceph_osd_db
+
+The `check_ceph_osd_db` checks the percentage usage of the BlueStore DB
+for the OSD and reports it as critical if it's above the threshold.
+
 [ceph]: http://www.ceph.com
 [cephx]: http://ceph.com/docs/master/rados/operations/authentication/
