@@ -72,3 +72,13 @@ deb: pre_deb
 	cp $(tmp_dir)/$(name)*.deb .
 	rm -rf $(tmp_dir)
 
+docker-build:
+	echo " \
+	FROM debian:buster\n \
+	ARG DEBIAN_FRONTEND=noninteractive\n	\
+	RUN apt-get update; \
+	apt-get --yes upgrade; \
+	apt-get --no-install-recommends --yes install build-essential fakeroot devscripts python debhelper dh-python" | docker build -t ceph-nagios-plugins-builder -
+	docker run -v $(CURDIR):/opt ceph-nagios-plugins-builder /bin/bash -c "cd /opt; make deb; make deb-src"
+
+# vim: set noexpandtab:
