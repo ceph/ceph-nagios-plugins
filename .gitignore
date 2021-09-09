@@ -3,3 +3,4 @@
 *.deb
 /.idea/
 /tmp/
+.history/
