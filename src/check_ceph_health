@@ -36,6 +36,7 @@ STATUS_WARNING = 1
 STATUS_ERROR = 2
 STATUS_UNKNOWN = 3
 
+
 def main():
 
     # parse args
@@ -129,7 +130,7 @@ def main():
     if output:
         ret = STATUS_OK
         msg = ""
-        extended = ""
+        extended = []
         if 'checks' in output:
             #luminous
             for check,status in output['checks'].items():
@@ -140,26 +141,29 @@ def main():
                 if args.skip_muted and ('muted' in status and status['muted']):
                     continue
 
+                check_detail = "%s( %s )" % (check, status['summary']['message'])
+
                 if status["severity"] == "HEALTH_ERR":
-                    extended += msg
-                    msg = "CRITCAL: %s( %s )" % (check,status['summary']['message'])
+                    extended.append(msg)
+                    msg = "CRITICAL: %s" % check_detail
                     ret = STATUS_ERROR
                     continue
 
                 if args.whitelist and re.search(args.whitelist,status['summary']['message']):
                     continue
 
+                check_msg = "WARNING: %s" % check_detail
                 if not msg:
-                    msg = "WARNING: %s( %s )" % (check,status['summary']['message'])
+                    msg = check_msg
                     ret = STATUS_WARNING
                 else:
-                     extended += "%s( %s )" % (check,status['summary']['message'])+'\n'
+                    extended.append(check_msg)
         else:
             #pre-luminous
             for status in output["summary"]:
                 if status != "HEALTH_OK":
                   if status == "HEALTH_ERROR":
-                      msg = "CRITCAL: %s" % status['summary']
+                      msg = "CRITICAL: %s" % status['summary']
                       ret = STATUS_ERROR
                       continue
 
@@ -170,12 +174,13 @@ def main():
                       msg = "WARNING: %s" % status['summary']
                       ret = STATUS_WARNING
                   else:
-                     extended += status['summary']+'\n'
+                     extended.append("WARNING: %s" % status['summary'])
+
         if msg:
             print(msg)
         else:
             print("HEALTH OK")
-        if extended: print(extended)
+        if extended: print('\n'.join(extended))
         return ret
 
 
