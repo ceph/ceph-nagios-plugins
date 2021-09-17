@@ -50,7 +50,7 @@ def main():
     parser.add_argument('-n','--name', help='ceph client name')
     parser.add_argument('-k','--keyring', help='ceph client keyring file')
     parser.add_argument('--check', help='regexp of which check(s) to check (luminous+) '
-                        "Can be inverted, e.g. '^((?!PG_DEGRADED|OBJECT_MISPLACED).)*$'")
+                        "Can be inverted, e.g. '^((?!(PG_DEGRADED|OBJECT_MISPLACED)$).)*$'")
     parser.add_argument('-w','--whitelist', help='whitelist regexp for ceph health warnings')
     parser.add_argument('-d','--detail', help="exec 'ceph health detail'", action='store_true')
     parser.add_argument('-V','--version', help='show version and exit', action='store_true')
