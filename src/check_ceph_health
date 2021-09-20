@@ -122,7 +122,7 @@ def main():
     try:
         output = json.loads(output)
     except ValueError:
-        return STATUS_UNKNOWN
+        output = dict()
 
     # parse output
     # print "output:", output
