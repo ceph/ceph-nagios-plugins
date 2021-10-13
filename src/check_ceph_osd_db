@@ -47,19 +47,19 @@ def main():
 
     ceph_exec = args.exe if args.exe else CEPH_COMMAND
     if not os.path.exists(ceph_exec):
-        print "UNKNOWN: ceph executable '%s' doesn't exist" % ceph_exec
+        print("UNKNOWN: ceph executable '%s' doesn't exist" % ceph_exec)
         return STATUS_UNKNOWN
 
     if args.conf and not os.path.exists(args.conf):
-        print "UNKNOWN: ceph conf file '%s' doesn't exist" % args.conf
+        print("UNKNOWN: ceph conf file '%s' doesn't exist" % args.conf)
         return STATUS_UNKNOWN
 
     if args.keyring and not os.path.exists(args.keyring):
-        print "UNKNOWN: keyring file '%s' doesn't exist" % args.keyring
+        print("UNKNOWN: keyring file '%s' doesn't exist" % args.keyring)
         return STATUS_UNKNOWN
 
     if not args.host:
-        print "UNKNOWN: no OSD hostname given"
+        print("UNKNOWN: no OSD hostname given")
         return STATUS_UNKNOWN
 
     try:
@@ -68,7 +68,7 @@ def main():
       if addrinfo[0][0] == socket.AF_INET6:
           args.host = "[%s]" % args.host
     except Exception:
-        print 'UNKNOWN: could not resolve %s' % args.host
+        print('UNKNOWN: could not resolve %s' % args.host)
         return STATUS_UNKNOWN
 
     ceph_cmd = [ceph_exec]
@@ -92,7 +92,7 @@ def main():
     output, err = p.communicate()
 
     if err or not output:
-        print "CRITICAL: %s" % err
+        print("CRITICAL: %s" % err)
         return STATUS_CRITICAL
 
     # escape IPv4 host address
@@ -117,13 +117,13 @@ def main():
         output, err = p.communicate()
 
         if err or not output:
-            print "CRITICAL: %s" % err
+            print("CRITICAL: %s" % err)
             return STATUS_CRITICAL
 
         try:
             data = json.loads(output)
         except Exception:
-            print "CRITICAL: failed to load json"
+            print("CRITICAL: failed to load json")
             return STATUS_CRITICAL
 
         bluefs = data.get('bluefs', None)
@@ -141,9 +141,9 @@ def main():
         lines.append("%s=%.2f%%" % (osd, perc))
 
     if final_status == STATUS_OK:
-        print "OK: %s" % (' '.join(lines))
+        print("OK: %s" % (' '.join(lines)))
     else:
-        print "CRITICAL: %s" % (' '.join(lines))
+        print("CRITICAL: %s" % (' '.join(lines)))
 
     return final_status
 
