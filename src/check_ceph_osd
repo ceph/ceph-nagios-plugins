@@ -141,7 +141,7 @@ def main():
 
   if up:
     print("OSD OK")
-    print("Up OSDs: " + " ".join(up))
+    print "Up OSDs: " + " ".join(str(i) for i in up)
     print("Down+In OSDs: " + " ".join(down_in))
     print("Down+Out OSDs: " + " ".join(down_out))
     print("| 'osd_up'=%d 'osd_down_in'=%d;;%d 'osd_down_out'=%d;;%d" % (len(up), len(down_in), args.crit, len(down_out), args.crit))
