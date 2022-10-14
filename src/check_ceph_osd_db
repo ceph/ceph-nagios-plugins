@@ -101,7 +101,7 @@ def main():
     osd_host = osd_host.replace('[', '\[')
     osd_host = osd_host.replace(']', '\]')
 
-    osds_up = re.findall(r"^(osd\.[^ ]*) up.*%s:" % (osd_host), output, re.MULTILINE)
+    osds_up = re.findall(r"^(osd\.[^ ]*) up.*%s:" % (osd_host), output.decode('utf-8'), re.MULTILINE)
 
     final_status = STATUS_OK
     lines = []
