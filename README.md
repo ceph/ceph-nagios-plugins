@@ -21,13 +21,17 @@ Can be filtered to only look at certain [health checks](https://docs.ceph.com/en
 
 ### Usage
 
-    usage: check_ceph_health [-h] [-e EXE] [-c CONF] [-m MONADDRESS] [-n NAME] [-i ID] [-k KEYRING] [-w WHITELIST] [-d]
+    usage: check_ceph_health [-h] [-e EXE] [-A ADMEXE] [--cluster CLUSTER] [-c CONF] [-m MONADDRESS] [-i ID] [-n NAME] [-k KEYRING] [--check CHECK] [-w WHITELIST]
+                             [-d] [-V] [-a] [-s]
 
     'ceph health' nagios plugin.
 
     optional arguments:
       -h, --help            show this help message and exit
       -e EXE, --exe EXE     ceph executable [/usr/bin/ceph]
+      -A ADMEXE, --admexe ADMEXE
+                            cephadm executable [/usr/sbin/cephadm]
+      --cluster CLUSTER     ceph cluster name
       -c CONF, --conf CONF  alternative ceph conf file
       -m MONADDRESS, --monaddress MONADDRESS
                             ceph monitor address[:port]
@@ -35,12 +39,13 @@ Can be filtered to only look at certain [health checks](https://docs.ceph.com/en
       -n NAME, --name NAME  ceph client name
       -k KEYRING, --keyring KEYRING
                             ceph client keyring file
-      --check CHECK         regexp of which check(s) to check (luminous+) Can be
-                            inverted, e.g. '^((?!PG_DEGRADED|OBJECT_MISPLACED).)*$'
-      -w, --whitelist REGEXP
+      --check CHECK         regexp of which check(s) to check (luminous+) Can be inverted, e.g. '^((?!(PG_DEGRADED|OBJECT_MISPLACED)$).)*$'
+      -w WHITELIST, --whitelist WHITELIST
                             whitelist regexp for ceph health warnings
       -d, --detail          exec 'ceph health detail'
       -V, --version         show version and exit
+      -a, --cephadm         uses cephadm to execute the command
+      -s, --skip-muted      skip muted checks
 
 ### Example
 
@@ -63,7 +68,6 @@ Can be filtered to only look at certain [health checks](https://docs.ceph.com/en
 
     nagios$ ./check_ceph_health --id nagios --check '^((?!PG_DEGRADED|OBJECT_MISPLACED).)*$'
     WARNING: MON_CLOCK_SKEW( clock skew detected on mon.a )
-
 
 ## check_ceph_mon
 
@@ -107,8 +111,7 @@ Possible result includes OK (up), WARN (down or missing).
 
 ### Usage
 
-    usage: check_ceph_osd [-h] [-e EXE] [-c CONF] [-m MONADDRESS] [-i ID]
-                         [-k KEYRING] [-V] -H HOST [-I OSDID] [-o]
+    usage: check_ceph_osd [-h] [-e EXE] [-c CONF] [-m MONADDRESS] [-i ID] [-k KEYRING] [-V] -H HOST [-I OSDID] [-C CRIT] [-o]
 
     'ceph osd' nagios plugin.
 
@@ -125,6 +128,7 @@ Possible result includes OK (up), WARN (down or missing).
       -H HOST, --host HOST  osd host
       -I OSDID, --osdid OSDID
                             osd id
+      -C CRIT, --crit CRIT  Number of failed OSDs to trigger critical (default=2)
       -o, --out             check osds that are set OUT
 
 ### Example
@@ -339,7 +343,6 @@ Possible result includes OK, WARN (laggy) and Error (not found).
 
 The `check_ceph_mgr` nagios plugin monitors the mgr.
 
-
 ### Usage
 
     usage: check_ceph_mgr [-h] [-e EXE] [-c CONF] [-m MONADDRESS] [-i ID]
@@ -368,6 +371,51 @@ The `check_ceph_mgr` nagios plugin monitors the mgr.
 
 The `check_ceph_osd_db` checks the percentage usage of the BlueStore DB
 for the OSD and reports it as critical if it's above the threshold.
+
+### Usage
+
+    usage: check_ceph_osd_db [-h] [-e EXE] [-c CONF] [-m MONADDRESS] [-i ID] [-k KEYRING] -H HOST [-C CRITICAL]
+
+    'ceph osd' nagios plugin.
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -e EXE, --exe EXE     ceph executable [/usr/bin/ceph]
+      -c CONF, --conf CONF  alternative ceph conf file
+      -m MONADDRESS, --monaddress MONADDRESS
+                            ceph monitor address[:port]
+      -i ID, --id ID        ceph client id
+      -k KEYRING, --keyring KEYRING
+                            ceph client keyring file
+      -H HOST, --host HOST  osd host
+      -C CRITICAL, --critical CRITICAL
+                            critical threshold
+
+## check_ceph_osd_df
+
+The `check_ceph_osd_df` checks the percentage usage of the the OSDs and
+reports if it's above the thresholds.
+
+### Usage
+
+    usage: check_ceph_osd_df [-h] [-e EXE] [-c CONF] [-m MONADDRESS] [-i ID] [-n NAME] [-k KEYRING] [-W WARN] [-C CRITICAL] [-V]
+
+    'ceph osd df' nagios plugin.
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -e EXE, --exe EXE     ceph executable [/usr/bin/ceph]
+      -c CONF, --conf CONF  alternative ceph conf file
+      -m MONADDRESS, --monaddress MONADDRESS
+                            ceph monitor address[:port]
+      -i ID, --id ID        ceph client id
+      -n NAME, --name NAME  ceph client name
+      -k KEYRING, --keyring KEYRING
+                            ceph client keyring file
+      -W WARN, --warn WARN  warn above this percent USED
+      -C CRITICAL, --critical CRITICAL
+                            critical alert above this percent USED
+      -V, --version         show version and exit
 
 [ceph]: http://www.ceph.com
 [cephx]: http://ceph.com/docs/master/rados/operations/authentication/
