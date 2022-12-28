@@ -25,9 +25,10 @@ import subprocess
 import sys
 import socket
 
-__version__ = '1.5.2'
+__version__ = '1.6.0'
 
 # default ceph values
+CEPH_ADM_COMMAND = '/usr/sbin/cephadm'
 CEPH_COMMAND = '/usr/bin/ceph'
 
 # nagios exit code
@@ -41,6 +42,7 @@ def main():
   # parse args
   parser = argparse.ArgumentParser(description="'ceph osd' nagios plugin.")
   parser.add_argument('-e','--exe', help='ceph executable [%s]' % CEPH_COMMAND)
+  parser.add_argument('-A','--admexe', help='cephadm executable [%s]' % CEPH_ADM_COMMAND)
   parser.add_argument('-c','--conf', help='alternative ceph conf file')
   parser.add_argument('-m','--monaddress', help='ceph monitor address[:port]')
   parser.add_argument('-i','--id', help='ceph client id')
@@ -50,13 +52,22 @@ def main():
   parser.add_argument('-I','--osdid', help='osd id', required=False)
   parser.add_argument('-C','--crit', help='Number of failed OSDs to trigger critical (default=2)',type=int,default=2, required=False)
   parser.add_argument('-o','--out', help='check osds that are set OUT', default=False, action='store_true', required=False)
+  parser.add_argument('-a','--cephadm', help='uses cephadm to execute the command', action='store_true')
   args = parser.parse_args()
 
   # validate args
+  cephadm_exec = args.admexe if args.admexe else CEPH_ADM_COMMAND
   ceph_exec = args.exe if args.exe else CEPH_COMMAND
-  if not os.path.exists(ceph_exec):
-    print("OSD ERROR: ceph executable '%s' doesn't exist" % ceph_exec)
-    return STATUS_UNKNOWN
+
+  if args.cephadm:
+      if not os.path.exists(cephadm_exec):
+          print("ERROR: cephadm executable '%s' doesn't exist" % cephadm_exec)
+          return STATUS_UNKNOWN
+  else:
+      if not os.path.exists(ceph_exec):
+          print("ERROR: ceph executable '%s' doesn't exist" % ceph_exec)
+          return STATUS_UNKNOWN
+
 
   if args.version:
     print('version %s' % __version__)
@@ -89,6 +100,18 @@ def main():
 
   # build command
   ceph_cmd = [ceph_exec]
+
+  if args.cephadm:
+    # Prepend the command with the cephadm binary and the shell command
+    ceph_cmd = [cephadm_exec, 'shell'] + ceph_cmd
+    ceph_cmd = [cephadm_exec, 'shell']
+
+    if args.keyring:
+        ceph_cmd.append('-v')
+        ceph_cmd.append('%s:%s:ro' % (args.keyring, args.keyring))
+    ceph_cmd.append('--')
+    ceph_cmd.append(ceph_exec)
+
   if args.monaddress:
       ceph_cmd.append('-m')
       ceph_cmd.append(args.monaddress)
