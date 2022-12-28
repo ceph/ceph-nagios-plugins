@@ -132,7 +132,7 @@ def main():
   output, err = p.communicate()
   output = output.decode('utf8')
 
-  if err or not output:
+  if p.returncode != 0 or not output:
     print("OSD ERROR: %s" % err)
     return STATUS_ERROR
 
