@@ -79,14 +79,6 @@ def main():
   if args.cephadm:
     # Prepend the command with the cephadm binary and the shell command
     rgw_cmd = [cephadm_exec, 'shell'] + rgw_cmd
-    rgw_cmd = [cephadm_exec, 'shell']
-
-    if args.keyring:
-      rgw_cmd.append('-v')
-      rgw_cmd.append('%s:%s:ro' % (args.keyring, args.keyring))
-    rgw_cmd.append('--')
-    rgw_cmd.append(rgw_exec)
-
   if args.conf:
     rgw_cmd.append('-c')
     rgw_cmd.append(args.conf)
