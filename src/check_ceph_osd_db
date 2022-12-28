@@ -164,7 +164,7 @@ def main():
         db_used_bytes = bluefs.get('db_used_bytes')
         perc = (float(db_used_bytes) / float(db_total_bytes) * 100)
 
-        if perc >= args.critical and final_status == STATUS_OK:
+        if perc >= float(args.critical) and final_status == STATUS_OK:
             final_status = STATUS_CRITICAL
 
         lines.append("%s=%.2f%%" % (osd, perc))
