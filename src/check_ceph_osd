@@ -60,13 +60,13 @@ def main():
   ceph_exec = args.exe if args.exe else CEPH_COMMAND
 
   if args.cephadm:
-      if not os.path.exists(cephadm_exec):
-          print("ERROR: cephadm executable '%s' doesn't exist" % cephadm_exec)
-          return STATUS_UNKNOWN
+    if not os.path.exists(cephadm_exec):
+      print("ERROR: cephadm executable '%s' doesn't exist" % cephadm_exec)
+      return STATUS_UNKNOWN
   else:
-      if not os.path.exists(ceph_exec):
-          print("ERROR: ceph executable '%s' doesn't exist" % ceph_exec)
-          return STATUS_UNKNOWN
+    if not os.path.exists(ceph_exec):
+      print("ERROR: ceph executable '%s' doesn't exist" % ceph_exec)
+      return STATUS_UNKNOWN
 
 
   if args.version:
@@ -103,7 +103,6 @@ def main():
 
   if args.cephadm:
     # Prepend the command with the cephadm binary and the shell command
-    ceph_cmd = [cephadm_exec, 'shell'] + ceph_cmd
     ceph_cmd = [cephadm_exec, 'shell']
 
     if args.keyring:
@@ -113,17 +112,17 @@ def main():
     ceph_cmd.append(ceph_exec)
 
   if args.monaddress:
-      ceph_cmd.append('-m')
-      ceph_cmd.append(args.monaddress)
+    ceph_cmd.append('-m')
+    ceph_cmd.append(args.monaddress)
   if args.conf:
-      ceph_cmd.append('-c')
-      ceph_cmd.append(args.conf)
+    ceph_cmd.append('-c')
+    ceph_cmd.append(args.conf)
   if args.id:
-      ceph_cmd.append('--id')
-      ceph_cmd.append(args.id)
+    ceph_cmd.append('--id')
+    ceph_cmd.append(args.id)
   if args.keyring:
-      ceph_cmd.append('--keyring')
-      ceph_cmd.append(args.keyring)
+    ceph_cmd.append('--keyring')
+    ceph_cmd.append(args.keyring)
   ceph_cmd.append('osd')
   ceph_cmd.append('dump')
 
