@@ -121,12 +121,11 @@ def main():
 
   if args.cephadm:
     # Prepend the command with the cephadm binary and the shell command
-    ceph_cmd = [cephadm_exec, 'shell'] + ceph_cmd
     ceph_cmd = [cephadm_exec, 'shell']
 
     if args.keyring:
-        ceph_cmd.append('-v')
-        ceph_cmd.append('%s:%s:ro' % (args.keyring, args.keyring))
+      ceph_cmd.append('-v')
+      ceph_cmd.append('%s:%s:ro' % (args.keyring, args.keyring))
     ceph_cmd.append('--')
     ceph_cmd.append(ceph_exec)
 
