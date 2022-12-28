@@ -96,13 +96,13 @@ def main():
   cephadm_exec = args.admexe if args.admexe else CEPH_ADM_COMMAND
   ceph_exec = args.exe if args.exe else CEPH_EXEC
   if args.cephadm:
-      if not os.path.exists(cephadm_exec):
-          print("ERROR: cephadm executable '%s' doesn't exist" % cephadm_exec)
-          return STATUS_UNKNOWN
+    if not os.path.exists(cephadm_exec):
+      print("ERROR: cephadm executable '%s' doesn't exist" % cephadm_exec)
+      return STATUS_UNKNOWN
   else:
-      if not os.path.exists(ceph_exec):
-          print("ERROR: ceph executable '%s' doesn't exist" % ceph_exec)
-          return STATUS_UNKNOWN
+    if not os.path.exists(ceph_exec):
+      print("ERROR: ceph executable '%s' doesn't exist" % ceph_exec)
+      return STATUS_UNKNOWN
 
   if args.conf and not os.path.exists(args.conf):
     print("MON ERROR: ceph conf file '%s' doesn't exist" % args.conf)
