@@ -25,9 +25,10 @@ import subprocess
 import sys
 import json
 
-__version__ = '1.5.1'
+__version__ = '1.6.0'
 
 # default ceph values
+CEPH_ADM_COMMAND = '/usr/sbin/cephadm'
 RGW_COMMAND = '/usr/bin/radosgw-admin'
 
 # nagios exit code
@@ -43,17 +44,26 @@ def main():
   parser.add_argument('-d','--detail', help='output perf data for all buckets', action='store_true')
   parser.add_argument('-B','--byte', help='output perf data in Byte instead of KB', action='store_true')
   parser.add_argument('-e','--exe', help='radosgw-admin executable [%s]' % RGW_COMMAND)
+  parser.add_argument('-A','--admexe', help='cephadm executable [%s]' % CEPH_ADM_COMMAND)
   parser.add_argument('-c','--conf', help='alternative ceph conf file')
   parser.add_argument('-i','--id', help='ceph client id')
   parser.add_argument('-n','--name', help='ceph client name (type.id)')
   parser.add_argument('-V','--version', help='show version and exit', action='store_true')
+  parser.add_argument('-a','--cephadm', help='uses cephadm to execute the command', action='store_true')
   args = parser.parse_args()
 
   # validate args
+  cephadm_exec = args.admexe if args.admexe else CEPH_ADM_COMMAND
   rgw_exec = args.exe if args.exe else RGW_COMMAND
-  if not os.path.exists(rgw_exec):
-    print("RGW ERROR: radosgw-admin executable '%s' doesn't exist" % rgw_exec)
-    return STATUS_UNKNOWN
+
+  if args.cephadm:
+      if not os.path.exists(cephadm_exec):
+          print("RGW ERROR: cephadm executable '%s' doesn't exist" % cephadm_exec)
+          return STATUS_UNKNOWN
+      else:
+        if not os.path.exists(rgw_exec):
+          print("RGW ERROR: radosgw-admin executable '%s' doesn't exist" % rgw_exec)
+          return STATUS_UNKNOWN
 
   if args.version:
     print('version %s' % __version__)
@@ -65,7 +75,19 @@ def main():
 
   # build command
   rgw_cmd = [rgw_exec]
-  if args.conf:
+
+  if args.cephadm:
+    # Prepend the command with the cephadm binary and the shell command
+    rgw_cmd = [cephadm_exec, 'shell'] + rgw_cmd
+    rgw_cmd = [cephadm_exec, 'shell']
+
+    if args.keyring:
+      rgw_cmd.append('-v')
+      rgw_cmd.append('%s:%s:ro' % (args.keyring, args.keyring))
+    rgw_cmd.append('--')
+    rgw_cmd.append(rgw_exec)
+
+if args.conf:
     rgw_cmd.append('-c')
     rgw_cmd.append(args.conf)
   if args.id:
