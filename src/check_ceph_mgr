@@ -23,11 +23,12 @@ import subprocess
 import sys
 import json
 
-__version__ = '1.0.0'
+__version__ = '1.1.0'
 
 # default ceph values
 CEPH_EXEC = '/usr/bin/ceph'
 CEPH_COMMAND = 'mgr dump -f json'
+CEPH_ADM_COMMAND = '/usr/sbin/cephadm'
 
 CEPH_MGR_DUMP_EXAMPLE = '''
 $ ceph --version
@@ -102,12 +103,14 @@ def main():
     # parse args
     parser = argparse.ArgumentParser(description="'ceph mgr dump' nagios plugin.")
     parser.add_argument('-e', '--exe', help='ceph executable [%s]' % CEPH_EXEC)
+    parser.add_argument('-A','--admexe', help='cephadm executable [%s]' % CEPH_ADM_COMMAND)
     parser.add_argument('-c', '--conf', help='alternative ceph conf file')
     parser.add_argument('-m', '--monaddress', help='ceph monitor to use for queries (address[:port])')
     parser.add_argument('-i', '--id', help='ceph client id')
     parser.add_argument('-n', '--name', help='ceph client name')
     parser.add_argument('-k', '--keyring', help='ceph client keyring file')
     parser.add_argument('-V', '--version', help='show version and exit', action='store_true')
+    parser.add_argument('-a','--cephadm', help='uses cephadm to execute the command', action='store_true')
     args = parser.parse_args()
 
     if args.version:
@@ -115,10 +118,16 @@ def main():
         return STATUS_OK
 
     # validate args
+    cephadm_exec = args.admexe if args.admexe else CEPH_ADM_COMMAND
     ceph_exec = args.exe if args.exe else CEPH_EXEC
-    if not os.path.exists(ceph_exec):
-        print("MGR ERROR: ceph executable '{}' doesn't exist".format(ceph_exec))
-        return STATUS_UNKNOWN
+    if args.cephadm:
+        if not os.path.exists(cephadm_exec):
+            print("ERROR: cephadm executable '%s' doesn't exist" % cephadm_exec)
+            return STATUS_UNKNOWN
+    else:
+        if not os.path.exists(ceph_exec):
+            print("MGR ERROR: ceph executable '{}' doesn't exist".format(ceph_exec))
+            return STATUS_UNKNOWN
 
     if args.conf and not os.path.exists(args.conf):
         print("MGR ERROR: ceph conf file '{}' doesn't exist".format(args.conf))
@@ -130,6 +139,16 @@ def main():
 
     # build command
     ceph_cmd = [ceph_exec]
+    if args.cephadm:
+        # Prepend the command with the cephadm binary and the shell command
+        ceph_cmd = [cephadm_exec, 'shell']
+
+        if args.keyring:
+            ceph_cmd.append('-v')
+            ceph_cmd.append('%s:%s:ro' % (args.keyring, args.keyring))
+        ceph_cmd.append('--')
+        ceph_cmd.append(ceph_exec)
+
     if args.monaddress:
         ceph_cmd.append('-m')
         ceph_cmd.append(args.monaddress)
