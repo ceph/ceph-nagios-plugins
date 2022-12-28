@@ -60,10 +60,10 @@ def main():
     if not os.path.exists(cephadm_exec):
       print("RGW ERROR: cephadm executable '%s' doesn't exist" % cephadm_exec)
       return STATUS_UNKNOWN
-    else:
-      if not os.path.exists(rgw_exec):
-        print("RGW ERROR: radosgw-admin executable '%s' doesn't exist" % rgw_exec)
-        return STATUS_UNKNOWN
+  else:
+    if not os.path.exists(rgw_exec):
+      print("RGW ERROR: radosgw-admin executable '%s' doesn't exist" % rgw_exec)
+      return STATUS_UNKNOWN
 
   if args.version:
     print('version %s' % __version__)
