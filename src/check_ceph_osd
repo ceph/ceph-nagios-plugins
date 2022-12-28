@@ -107,8 +107,8 @@ def main():
     ceph_cmd = [cephadm_exec, 'shell']
 
     if args.keyring:
-        ceph_cmd.append('-v')
-        ceph_cmd.append('%s:%s:ro' % (args.keyring, args.keyring))
+      ceph_cmd.append('-v')
+      ceph_cmd.append('%s:%s:ro' % (args.keyring, args.keyring))
     ceph_cmd.append('--')
     ceph_cmd.append(ceph_exec)
 
