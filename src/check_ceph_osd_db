@@ -128,7 +128,7 @@ def main():
     osd_host = osd_host.replace('[', '\[')
     osd_host = osd_host.replace(']', '\]')
 
-    osds_up = re.findall(r"^(osd\.[^ ]*) up.*%s:" % (osd_host), output, re.MULTILINE)
+    osds_up = re.findall(r"^(osd\.[^ ]*) up.*%s:" % (osd_host), output.decode('utf-8'), re.MULTILINE)
 
     final_status = STATUS_OK
     lines = []
@@ -145,8 +145,8 @@ def main():
         p = subprocess.Popen(daemon_ceph_cmd,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
         output, err = p.communicate()
 
-        if err or not output:
-            print("CRITICAL: %s" % err)
+        if p.returncode != 0 or not output:
+            print("CRITICAL: %s" % '\n'.join(err.decode('utf-8').split('\n')[(4 if args.cephadm else 0):]))
             return STATUS_CRITICAL
 
         try:
