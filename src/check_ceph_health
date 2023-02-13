@@ -24,7 +24,7 @@ import sys
 import re
 import json
 
-__version__ = '1.7.0'
+__version__ = '1.8.0'
 
 # default ceph values
 CEPH_ADM_COMMAND = '/usr/sbin/cephadm'
@@ -109,12 +109,12 @@ def main():
         ceph_health.append('--keyring')
         ceph_health.append(args.keyring)
     ceph_health.append('health')
+    # For this plugin 'detail' seems a noop at least in nautilus
     if args.detail:
         ceph_health.append('detail')
 
     ceph_health.append('--format')
     ceph_health.append('json')
-    #print(ceph_health)
 
     # exec command
     p = subprocess.Popen(ceph_health,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
@@ -124,14 +124,27 @@ def main():
     except ValueError:
         output = dict()
 
-    # parse output
-    # print "output:", output
-    #print "err:", err
     if output:
-        ret = STATUS_OK
-        msg = ""
-        extended = []
+        criticals = []
+        warnings = []
+        msg = 'UNKNOWN'
+        ret = STATUS_UNKNOWN
+
+        # We do this just in case there are no checks - which would be weird?
+        if 'status' in output:
+            if output['status'] == 'HEALTH_OK':
+                ret = STATUS_OK
+                msg = 'OK'
+            elif output['status'] == 'HEALTH_WARN':
+                ret = STATUS_WARNING
+                msg = 'WARNING'
+            elif output['status'] == 'HEALTH_ERR':
+                ret = STATUS_ERROR
+                msg = 'CRITICAL'
+
         if 'checks' in output:
+            ret = STATUS_OK
+            msg = ''
             #luminous
             for check,status in output['checks'].items():
                  # skip check if not selected
@@ -141,46 +154,41 @@ def main():
                 if args.skip_muted and ('muted' in status and status['muted']):
                     continue
 
-                check_detail = "%s( %s )" % (check, status['summary']['message'])
+                check_detail = "%s (%s)" % (check, status['summary']['message'])
 
                 if status["severity"] == "HEALTH_ERR":
-                    extended.append(msg)
-                    msg = "CRITICAL: %s" % check_detail
-                    ret = STATUS_ERROR
+                    criticals.append(check_detail)
                     continue
 
                 if args.whitelist and re.search(args.whitelist,status['summary']['message']):
                     continue
 
-                check_msg = "WARNING: %s" % check_detail
-                if not msg:
-                    msg = check_msg
-                    ret = STATUS_WARNING
-                else:
-                    extended.append(check_msg)
+                warnings.append(check_detail)
         else:
             #pre-luminous
             for status in output["summary"]:
                 if status != "HEALTH_OK":
                   if status == "HEALTH_ERROR":
-                      msg = "CRITICAL: %s" % status['summary']
-                      ret = STATUS_ERROR
+                      criticals.append(status['summary'])
                       continue
 
                   if args.whitelist and re.search(args.whitelist,status['summary']):
                       continue
 
-                  if not msg:
-                      msg = "WARNING: %s" % status['summary']
-                      ret = STATUS_WARNING
-                  else:
-                     extended.append("WARNING: %s" % status['summary'])
+                  warnings.append(status['summary'])
 
-        if msg:
-            print(msg)
-        else:
-            print("HEALTH OK")
-        if extended: print('\n'.join(extended))
+        # Build the message for nagios
+        if len(criticals) > 0:
+            msg += "CRITICAL: %s " % ', '.join(criticals)
+            ret = STATUS_ERROR
+
+        if len(warnings) > 0:
+            msg += "WARNING: %s" % ', '.join(warnings)
+            if ret == STATUS_OK: ret = STATUS_WARNING
+
+        if ret == STATUS_OK: msg = 'OK'
+
+        print(msg)
         return ret
 
 
