@@ -3,10 +3,10 @@ Maintainer: Valery Tschopp <valery.tschopp@switch.ch>
 Section: misc
 Priority: optional
 Standards-Version: 3.9.8
-Build-Depends: debhelper (>= 9), dh-python, python:any
+Build-Depends: debhelper (>= 9), dh-python, python3:any
 
 Package: nagios-plugins-ceph
 Architecture: all
-Depends: python, ${misc:Depends}, ${python:Depends}
+Depends: python3, ${misc:Depends}, ${python:Depends}
 Description: Nagios plugins for Ceph
  This package provides a set of plugins to monitor a ceph cluster.
